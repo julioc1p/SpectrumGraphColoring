@@ -142,3 +142,40 @@ class SpectrumGraphColoring(object):
             at every vertex is at most that threshold t.
         """
         pass
+
+
+if __name__ == "__main__":
+    
+
+    g = {
+        "a": ["b", "c"],
+        "b": ["a", "c"],
+        "c": ["a", "b", "d"],
+        "d": ["c"]
+    }
+    graph = Graph(g)
+    S = ["red", "green", "blue", "violet"]
+    W = {
+        "red": {"red": 1, "green": .5, "blue": .25, "violet":.125},
+        "green": {"red": .5, "green": 1, "blue": .5, "violet": .25},
+        "blue": {"red": .25, "green": .5, "blue": 1, "violet": .5},
+        "violet": {"red": .125, "green": .25, "blue": .5, "violet": 1}        
+    }
+    c = {"a": "red", "b": "green", "c": "blue", "d": "red"}
+    sgraph = SpectrumGraphColoring(graph, S, W, c)
+
+    print('Graph:')
+    print(sgraph)
+
+    print('Interference of every vertex:')
+    for vertex in sgraph.vertices():
+        print(f'the interference of {vertex} is: {sgraph.vertex_interference(vertex)}')
+    
+    print('The graph is w-stable: ')
+    print(sgraph.is_wstable())
+
+    print('Upper bound for the TSC problem:')
+    print(sgraph.tsc_upper_bound(3))
+
+    print('Upper bound for the CSC problem:')
+    print(sgraph.csc_upper_bound(1))
