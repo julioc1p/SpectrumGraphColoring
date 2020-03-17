@@ -40,30 +40,33 @@ class SpectrumGraphColoring(object):
         """
         self.__c = c
     
+    def vertices(self):
+        return self.__graph.vertices()
+
     def vertex_interference(self, vertex):
         """ The interference of a vertex is the sum of the interferences in self.__w
-            between the color of "vertex" and the color of its neighbors.
+            between the color of "vertex" and the color of its neighbours.
         """
         return self.__potential_interference(vertex, self.__c[vertex])
 
     def __potential_interference(self, vertex, color):
         """ potential interference of a vertex "vertex" with a color "color" is
             the sum of the interferences in self.__w of "color" and the color of
-            "vertex"'s neighbors.
+            "vertex"'s neighbours.
         """
         if not self.__c or not color in self.__spectrum:
             return -1
         interference = 0
-        for neighbor in self.__graph.vertices:
-            neighbor_color = self.__c[neighbor]
-            interference += self.__w[color][neighbor_color]
+        for neighbour in self.__graph.neighbours(vertex):
+            neighbour_color = self.__c[neighbour]
+            interference += self.__w[color][neighbour_color]
         return interference
         
     def is_wstable(self):
         """ we say that the k-coloring c is w-stable if, for every vertex,
             the actual interference is not greater than any of the potential interferences.
         """
-        for vertex in self.__graph.vertices:
+        for vertex in self.__graph.vertices():
             vertex_interference = self.vertex_interference(vertex)
             for color in self.__spectrum:
                 if self.__potential_interference(vertex, color) < vertex_interference:
@@ -87,12 +90,12 @@ class SpectrumGraphColoring(object):
         """
         nnorm = self.__natural_norm()
         Delta = self.__graph.Delta()
-        if len(self.__spectrum)*t < Delta*nnorm:
-            return -1
-        w = [self.__w[i] for i in self.__w]
+        # if len(self.__spectrum)*t < Delta*nnorm:
+        #     return -1
+        w = [self.__w[i].values() for i in self.__w]
         w = [item for sublist in w for item in sublist]
         gcd_w = lgcd(w)
-        if gcd_w % t == 0:
+        if gcd_w % t == 0 or t == 1:
             return -( -(Delta*nnorm + gcd_w) // (t + gcd_w) )
         else :
             return -( -(Delta*nnorm + gcd_w) // (gcd_w * (t//gcd_w) + gcd_w) )
@@ -104,7 +107,25 @@ class SpectrumGraphColoring(object):
             row_sum = sum(self.__w[i].values())
             if row_sum > max_row_sum:
                 max_row_sum = row_sum
-        return max_row_sum  
+        return max_row_sum
+
+    def __str__(self):
+        res = "vertices: "
+        for v in self.__graph.vertices():
+            res += str(v) + " "
+        res += "\nedges: "
+        for edge in self.__graph.edges():
+            res += str(edge) + " "
+        res += "\ncolors: "
+        for color in self.__spectrum:
+            res += str(color) + " "
+        res += "\ncoloring: "
+        if self.__c:
+            for item in self.__c:
+                res += str(item) + "->" + str(self.__c[item]) + " "
+        else:
+            res += "-"
+        return res
 
     def ThresholdSpectrumColoring(self, k):
         """ The TSC problem determinates the minimum threshold t, 
