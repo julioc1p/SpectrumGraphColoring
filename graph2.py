@@ -21,6 +21,12 @@ class Graph(object):
         """ returns the edges of a graph """
         return self.__generate_edges()
 
+    def neighbours(self, vertex):
+        """ returns the neighbours of "vertex" in
+            the graph
+        """
+        return self.__graph_dict[vertex]
+
     def add_vertex(self, vertex):
         """ If the vertex "vertex" is not in 
             self.__graph_dict, a key "vertex" with an empty
