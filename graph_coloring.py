@@ -43,22 +43,24 @@ class SpectrumGraphColoring(object):
     def vertices(self):
         return self._graph.vertices()
 
-    def vertex_interference(self, vertex):
+    def vertex_interference(self, vertex, c=None):
         """ The interference of a vertex is the sum of the interferences in self._w
             between the color of "vertex" and the color of its neighbours.
         """
-        return self._potential_interference(vertex, self._c[vertex])
+        if not c:
+            c = self._c
+        return self._potential_interference(vertex, c[vertex], c)
 
-    def _potential_interference(self, vertex, color):
+    def _potential_interference(self, vertex, color, c=None):
         """ potential interference of a vertex "vertex" with a color "color" is
             the sum of the interferences in self._w of "color" and the color of
             "vertex"'s neighbours.
         """
-        if not self._c or not color in self._spectrum:
-            return -1
+        if not c:
+            c = self._c
         interference = 0
         for neighbour in self._graph.neighbours(vertex):
-            neighbour_color = self._c[neighbour]
+            neighbour_color = c[neighbour]
             interference += self._w[color][neighbour_color]
         return interference
         
