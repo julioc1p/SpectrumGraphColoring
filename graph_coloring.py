@@ -29,70 +29,70 @@ class SpectrumGraphColoring(object):
             "graph" is a Graph object, "spectrum" is a list
             of colors and "w" is a dictionary of weights.
         """
-        self.__graph = graph
-        self.__spectrum = spectrum
-        self.__w = w
-        self.__c = c
+        self._graph = graph
+        self._spectrum = spectrum
+        self._w = w
+        self._c = c
 
     def set_coloring(self, c):
-        """ set a coloring "c" to the vertices of self.__graph, 
+        """ set a coloring "c" to the vertices of self._graph, 
             "c" is expected to be a dict.
         """
-        self.__c = c
+        self._c = c
     
     def vertices(self):
-        return self.__graph.vertices()
+        return self._graph.vertices()
 
     def vertex_interference(self, vertex):
-        """ The interference of a vertex is the sum of the interferences in self.__w
+        """ The interference of a vertex is the sum of the interferences in self._w
             between the color of "vertex" and the color of its neighbours.
         """
-        return self.__potential_interference(vertex, self.__c[vertex])
+        return self._potential_interference(vertex, self._c[vertex])
 
-    def __potential_interference(self, vertex, color):
+    def _potential_interference(self, vertex, color):
         """ potential interference of a vertex "vertex" with a color "color" is
-            the sum of the interferences in self.__w of "color" and the color of
+            the sum of the interferences in self._w of "color" and the color of
             "vertex"'s neighbours.
         """
-        if not self.__c or not color in self.__spectrum:
+        if not self._c or not color in self._spectrum:
             return -1
         interference = 0
-        for neighbour in self.__graph.neighbours(vertex):
-            neighbour_color = self.__c[neighbour]
-            interference += self.__w[color][neighbour_color]
+        for neighbour in self._graph.neighbours(vertex):
+            neighbour_color = self._c[neighbour]
+            interference += self._w[color][neighbour_color]
         return interference
         
     def is_wstable(self):
         """ we say that the k-coloring c is w-stable if, for every vertex,
             the actual interference is not greater than any of the potential interferences.
         """
-        for vertex in self.__graph.vertices():
+        for vertex in self._graph.vertices():
             vertex_interference = self.vertex_interference(vertex)
-            for color in self.__spectrum:
-                if self.__potential_interference(vertex, color) < vertex_interference:
+            for color in self._spectrum:
+                if self._potential_interference(vertex, color) < vertex_interference:
                     return False
         return True
 
     def tsc_upper_bound(self, k):
         """ it determites the upper bound for the tsc problem,
-            using self.__graph, self.__spectrum and the matrix self.__w,
-            and a "k" between 2 and |self.__w|.
+            using self._graph, self._spectrum and the matrix self._w,
+            and a "k" between 2 and |self._w|.
         """
-        nnorm = self.__natural_norm()
-        Delta = self.__graph.Delta()
+        nnorm = self._natural_norm()
+        Delta = self._graph.Delta()
         return (Delta*nnorm)/k
     
     def csc_upper_bound(self, t):
         """ it determites the upper bound for the csc problem,
-            using self.__graph, self.__spectrum, the matrix self.__w
+            using self._graph, self._spectrum, the matrix self._w
             and a "t" such that 
-            |self.__w|*t >= MaxDeg(self.__graph)*NormalNorm(self.__w).
+            |self._w|*t >= MaxDeg(self._graph)*NormalNorm(self._w).
         """
-        nnorm = self.__natural_norm()
-        Delta = self.__graph.Delta()
-        # if len(self.__spectrum)*t < Delta*nnorm:
+        nnorm = self._natural_norm()
+        Delta = self._graph.Delta()
+        # if len(self._spectrum)*t < Delta*nnorm:
         #     return -1
-        w = [self.__w[i].values() for i in self.__w]
+        w = [self._w[i].values() for i in self._w]
         w = [item for sublist in w for item in sublist]
         gcd_w = lgcd(w)
         if gcd_w % t == 0 or t == 1:
@@ -100,29 +100,29 @@ class SpectrumGraphColoring(object):
         else :
             return -( -(Delta*nnorm + gcd_w) // (gcd_w * (t//gcd_w) + gcd_w) )
 
-    def __natural_norm(self):
-        """ a static method to calculate the natural norm of self.__w """
+    def _natural_norm(self):
+        """ a static method to calculate the natural norm of self._w """
         max_row_sum = 0
-        for i in self.__w:
-            row_sum = sum(self.__w[i].values())
+        for i in self._w:
+            row_sum = sum(self._w[i].values())
             if row_sum > max_row_sum:
                 max_row_sum = row_sum
         return max_row_sum
 
     def __str__(self):
         res = "vertices: "
-        for v in self.__graph.vertices():
+        for v in self._graph.vertices():
             res += str(v) + " "
         res += "\nedges: "
-        for edge in self.__graph.edges():
+        for edge in self._graph.edges():
             res += str(edge) + " "
         res += "\ncolors: "
-        for color in self.__spectrum:
+        for color in self._spectrum:
             res += str(color) + " "
         res += "\ncoloring: "
-        if self.__c:
-            for item in self.__c:
-                res += str(item) + "->" + str(self.__c[item]) + " "
+        if self._c:
+            for item in self._c:
+                res += str(item) + "->" + str(self._c[item]) + " "
         else:
             res += "-"
         return res
