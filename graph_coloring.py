@@ -80,7 +80,7 @@ class SpectrumGraphColoring(object):
             .i.e the maximum interference of the vertices in the graph for
             that coloring.
         """
-        return max([self.vertex_interference(v) for v in self.vertices()])
+        return max([self.vertex_interference(v, c) for v in self.vertices()])
 
     def tsc_upper_bound(self, k):
         """ it determites the upper bound for the tsc problem,
