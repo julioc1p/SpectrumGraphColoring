@@ -75,6 +75,13 @@ class SpectrumGraphColoring(object):
                     return False
         return True
 
+    def threshold(self, c=None):
+        """ it determines the threshold for a coloring ("c" or self._c),
+            .i.e the maximum interference of the vertices in the graph for
+            that coloring.
+        """
+        return max([self.vertex_interference(v) for v in self.vertices()])
+
     def tsc_upper_bound(self, k):
         """ it determites the upper bound for the tsc problem,
             using self._graph, self._spectrum and the matrix self._w,
@@ -175,6 +182,9 @@ if __name__ == "__main__":
     
     print('The graph is w-stable: ')
     print(sgraph.is_wstable())
+
+    print('The threshold is:')
+    print(sgraph.threshold())
 
     print('Upper bound for the TSC problem:')
     print(sgraph.tsc_upper_bound(3))
