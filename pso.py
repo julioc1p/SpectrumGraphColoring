@@ -1,6 +1,5 @@
 import numpy as np
 import pyswarms as ps
-from pyswarms.utils.functions import single_obj as fx
 from graph_coloring import SpectrumGraphColoring
 from graph2 import Graph
 
@@ -22,7 +21,7 @@ class PSOGraphColoring(SpectrumGraphColoring):
             in the usual dict representation.
         """
         vertices = self.vertices()
-        return {vertices[i]:self._spectrum[int(c[i]-1.e-10)] for i in range(len(c))}
+        return {vertices[i]:self._spectrum[int(c[i]-1e-10)] for i in range(len(c))}
 
     def _opt_fun(self, x, k):
         """ function of optimization used for the PSO algorithm,
@@ -59,6 +58,19 @@ class PSOGraphColoring(SpectrumGraphColoring):
         best_c = self._index2dict(best_c)
         return self.threshold(best_c), best_c
 
+    def ChromaticSpectrumColoring(self, t, swarm_size=10, c1=1.5, c2=1.5, w=0.5, iterations=1000):
+        """ Solution for the CSC problem using a PSO algorithm
+            It takes some aditional parameters for the algorithm
+        """
+        n_vertices = len(self.vertices())
+        # we will just check for every 1 <= K <= n_vertices if the
+        # previuos TSC algorithm result is lower than the threshold "t",
+        # and the least of these Ks will be our result.
+        for k in range(1,n_vertices):
+            threshold, best_c = self.ThresholdSpectrumColoring(k, swarm_size, c1, c2, w, iterations)
+            if threshold <= t:
+                return k, best_c
+        return n_vertices, None
     
 
 if __name__ == "__main__":
@@ -80,9 +92,13 @@ if __name__ == "__main__":
     }
     sgraph = PSOGraphColoring(graph, S, W)
 
+    k0 = 3
+    t0 = 1.0
+    t = sgraph.ThresholdSpectrumColoring(k0)
+    k = sgraph.ChromaticSpectrumColoring(t0)
     print('Graph:')
     print(sgraph)
-
-    k = 3
-    print(f'PSO best value and coloring for the TSC problem and k = {k}:')
-    print(sgraph.ThresholdSpectrumColoring(k))
+    print(f'PSO best value and coloring for the TSC problem and k = {k0}:')
+    print(t)
+    print(f'PSO best value and coloring for the TSC problem and t = {t0}:')
+    print(k)
