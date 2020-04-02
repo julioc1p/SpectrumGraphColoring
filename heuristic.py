@@ -11,96 +11,152 @@ class DSATURGraphColoring(SpectrumGraphColoring):
         super().__init__(graph, spectrum, w, c)
         vertices = graph.vertices()
         self._vertex_degree = {v:len(graph.neighbours(v)) for v in vertices}
-        self._saturation_degree = {v:0 for v in vertices}
+        self._saturation_degree = {}
+        self._color_interference = {}
+
         
     def _max_saturation_degree(self, semi_coloring):
-        vertex = None
-        max_sdeg = 0
-        max_deg = 0
+        best_v = []
         for v in self.vertices():
             if not semi_coloring[v]:
-                if not vertex:
-                    vertex = v
-                    max_sdeg = self._saturation_degree[v]
-                    max_deg = self._vertex_degree[v]
-                if self._saturation_degree[v] > max_sdeg:
-                    vertex = v
-                    max_sdeg = self._saturation_degree[v]
-                    max_deg = self._vertex_degree[v]
-                elif self._saturation_degree[v] == max_sdeg and self._vertex_degree[v] > max_deg:
-                    vertex = v
-                    max_sdeg = self._saturation_degree[v]
-                    max_deg = self._vertex_degree[v]
-                # elif self._saturation_degree[v] == max_sdeg and self._vertex_degree[v] == max_deg:
-                #     vertex.append(v)
-        return vertex
+                if not best_v:
+                    best_v = [v]
+                if self._saturation_degree[v] > self._saturation_degree[best_v[0]]:
+                    best_v = [v]
+                elif self._saturation_degree[v] == self._saturation_degree[best_v[0]] and \
+                        self._vertex_degree[v] > self._vertex_degree[best_v[0]]:
+                    best_v = [v]
+                elif self._saturation_degree[v] == self._saturation_degree[best_v[0]] and \
+                        self._vertex_degree[v] == self._vertex_degree[best_v[0]]:
+                    best_v.append(v)
+        return random.choice(best_v)
 
     def _min_semi_interference(self, vertex, semi_coloring, spectrum):
         # if sum([1 if x else 0 for x in semi_coloring.values()])==0:
         #     return random.choice(spectrum)
-        semi_interferences = np.array([self._semi_interference(vertex, c, semi_coloring) for c in spectrum])
-        arg_color = semi_interferences.argmin()
-        return spectrum[arg_color]
+        best_c = None
+        best = 1e10
+        for c in spectrum:
+            if self._color_interference[vertex][c] < best:
+                best = self._color_interference[vertex][c]
+                best_c = c
+        return best_c
 
-    def _semi_interference(self, vertex, color, semi_coloring):
-        interference = 0
-        for v in self._graph.neighbours(vertex):
-            if semi_coloring[v]:
-                interference+=self._w[color][semi_coloring[v]]
-        return interference
-
-    def _update_saturation_degree(self, vertex):
+    def _update_saturation_degree(self, vertex,color, semi_coloring):
         for w in self._graph.neighbours(vertex):
             self._saturation_degree[w]+=1
+            if semi_coloring[w] is None:
+                for c in self._spectrum:
+                    self._color_interference[w][c]+= self._w[color][c]
 
-    def ThresholdSpectrumColoring(self, k):       
-        self._saturation_degree = {v:0 for v in self.vertices()}
-        spectrum = self._spectrum
-        k_spectrum = set()
-        semi_coloring = {v:None for v in self.vertices()}
+    def ThresholdSpectrumColoring(self, k):
+        semi_coloring = self._new_coloring()
+        spectrum = self._spectrum[:k]
+        # k_spectrum = set()
         n_colored = 0
         n_vertices = len(self.vertices())
         while n_colored < n_vertices:
             vertex = self._max_saturation_degree(semi_coloring)
             color = self._min_semi_interference(vertex, semi_coloring, spectrum)
-            if len(k_spectrum) == k-1:
-                k_spectrum.add(color)
-                spectrum = list(k_spectrum)
-            if len(k_spectrum) < k: 
-                k_spectrum.add(color)
+            # if len(k_spectrum) == k-1:
+            #     k_spectrum.add(color)
+            #     spectrum = list(k_spectrum)
+            # if len(k_spectrum) < k: 
+            #     k_spectrum.add(color)
             semi_coloring[vertex] = color
             n_colored+=1
-            self._update_saturation_degree(vertex)
+            self._update_saturation_degree(vertex, color, semi_coloring)
         return self.threshold(semi_coloring), semi_coloring
+
+    def ChromaticSpectrumColoring(self, t):
+        semi_coloring = self._new_coloring()
+        n_colored = 0
+        n_vertices = len(self.vertices())
+        color = None
+        while n_colored < n_vertices:
+            v = self._max_saturation_degree(semi_coloring)
+            i = 0
+            I = 1e10
+
+            for c in self._spectrum:
+                I = self._color_interference[v][c]
+                if I > self._saturation_degree[v]/len(self._graph.neighbours(v))*t:
+                    continue
+                semi_coloring[v] = c
+                if all([1 if not semi_coloring[w] else self._semi_interference(w, semi_coloring) <= \
+                    (self._saturation_degree[w]+1)/len(self._graph.neighbours(w))*t for w in self._graph.neighbours(v)]):
+                    n_colored+=1
+                    self._update_saturation_degree(v, c, semi_coloring)
+                    break
+                semi_coloring[v] = None
+            if not semi_coloring[v]:
+                return n_vertices, {v:None for v in self.vertices()}
+        return len(set(semi_coloring.values())), semi_coloring
+        
+
+        #     while I > self._saturation_degree[v]/len(self._graph.neighbours(v))*t and \
+        #         i < len(self._spectrum):
+        #         color = self._spectrum[i]
+        #         I = self._color_interference[v][color]
+        #         if I <= self._saturation_degree[v]/len(self._graph.neighbours(v))*t:
+        #             semi_coloring[v] = color
+        #             for w in self._graph.neighbours(v):
+        #                 if not semi_coloring[w]:
+        #                     continue
+        #                 I = self._semi_interference(w, semi_coloring)
+        #                 if I > (self._saturation_degree[w]+1)/len(self._graph.neighbours(w))*t:
+        #                     break
+        #             semi_coloring[v] = None
+        #         i+=1
+        #     if i >= len(self._spectrum):
+        #         return n_vertices, {v:None for v in self.vertices()}
+        #     else:
+        #         semi_coloring[v] = color
+        #         n_colored+=1
+        #         self._update_saturation_degree(v, color, semi_coloring)
+        # return len(set(semi_coloring.values())), semi_coloring
+
+
+    def _new_coloring(self):
+        self._saturation_degree = {v:0 for v in self.vertices()}
+        self._color_interference = {v:{c:0 for c in self._spectrum} for v in self.vertices()}
+        return {v:None for v in self.vertices()}
+
+    def _semi_interference(self, vertex, semi_coloring):
+        interference = 0
+        for v in self._graph.neighbours(vertex):
+            if semi_coloring[v]:
+                interference+=self._w[semi_coloring[vertex]][semi_coloring[v]]
+        return interference
 
 
 
 if __name__ == "__main__":
     
 
-    # g = {
-    #     "a": ["b", "c"],
-    #     "b": ["a", "c"],
-    #     "c": ["a", "b", "d"],
-    #     "d": ["c"]
-    # }
-    # graph = Graph(g)
-    # S = ["red", "green", "blue", "violet"]
-    # W = {
-    #     "red": {"red": 1, "green": .5, "blue": .25, "violet":.125},
-    #     "green": {"red": .5, "green": 1, "blue": .5, "violet": .25},
-    #     "blue": {"red": .25, "green": .5, "blue": 1, "violet": .5},
-    #     "violet": {"red": .125, "green": .25, "blue": .5, "violet": 1}        
-    # }
-    # sgraph = DSATURGraphColoring(graph, S, W)
+    g = {
+        "a": ["b", "c"],
+        "b": ["a", "c"],
+        "c": ["a", "b", "d"],
+        "d": ["c"]
+    }
+    graph = Graph(g)
+    S = ["red", "green", "blue", "violet"]
+    W = {
+        "red": {"red": 1, "green": .5, "blue": .25, "violet":.125},
+        "green": {"red": .5, "green": 1, "blue": .5, "violet": .25},
+        "blue": {"red": .25, "green": .5, "blue": 1, "violet": .5},
+        "violet": {"red": .125, "green": .25, "blue": .5, "violet": 1}        
+    }
+    sgraph = DSATURGraphColoring(graph, S, W)
 
-    # print('Graph:')
-    # print(sgraph)
+    print('Graph:')
+    print(sgraph)
 
-    # k = 3
-    # t = sgraph.ThresholdSpectrumColoring(k)
-    # print(f'PSO best value and coloring for the TSC problem and k = {k}:')
-    # print(t)
+    k = 3
+    t = sgraph.ChromaticSpectrumColoring(1)
+    print(f'PSO best value and coloring for the TSC problem and k = {k}:')
+    print(t)
 
     
     LD = {
@@ -176,21 +232,21 @@ if __name__ == "__main__":
         W[str(i)] = w_
     S = [str(i) for i in range(1,12)]
 
-    graph = Graph(MD_)
+    graph = Graph(LD)
     sgraph = DSATURGraphColoring(graph, S, W)
+    print(sgraph.ChromaticSpectrumColoring(2))
+    # # print('Graph:')
+    # # print(sgraph)
 
-    # print('Graph:')
-    # print(sgraph)
-
-    k = 11
-    r = []
-    solution = None
-    for _ in range(100):
-        t = sgraph.ThresholdSpectrumColoring(k)
-        # print(f'DSATUR best value and coloring for the TSC problem and k = {k}:')
-        # print(t)
-        r.append(t[0])
-        # solution = t[1]
-    r = np.array(r)
-    print('{0:.1f}'.format(r.mean()))
-    print('{0:.2f}'.format(r.std()))    
+    # k = 11
+    # r = []
+    # solution = None
+    # for _ in range(1000):
+    #     t = sgraph.ThresholdSpectrumColoring(k)
+    #     # print(f'DSATUR best value and coloring for the TSC problem and k = {k}:')
+    #     # print(t)
+    #     r.append(t[0])
+    #     # solution = t[1]
+    # r = np.array(r)
+    # print('{0:.1f}'.format(r.mean()))
+    # print('{0:.2f}'.format(r.std()))    
