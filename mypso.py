@@ -28,7 +28,7 @@ class MyPSO():
         self.pbest_value = np.array(pbest_value)
         self.pbest_position = np.array(pbest_position)
 
-    def minimize(self, fun, n_iters, w=0.5, c1=0.8, c2=0.9, *args, **kargs):
+    def minimize(self, fun, n_iters, w, c1, c2, *args, **kargs):
         self.init_particles(fun, *args, **kargs)
         iters = 0
         while iters < n_iters:
@@ -52,14 +52,19 @@ class MyPSO():
                 new_velocity = (w*self.velocities[i]) + (c1*random.random()) * (self.pbest_position[i] - particle) + \
                             (c2*random.random()) * (self.gbest_position - particle)
                 new_particle = particle + new_velocity
-                if self.try_move(new_particle):
-                    self.particles[i] = new_particle
-                    self.velocities[i] = new_velocity
+                self.try_move(particle, new_particle)
+                self.particles[i] = new_particle
+                self.velocities[i] = new_velocity
+                # else:
+                #     print('PInga !!!!!!!!!!!!!!!!!!!!!')
             iters+=1
         return self.gbest_value, self.gbest_position
 
-    def try_move(self, particle):
-        return all([x >= self.min and x < self.max for x in particle])
+    def try_move(self, particle, new_particle):
+        for i in range(self.dim):
+            if new_particle[i] >= self.max or new_particle[i] < self.min:
+                new_particle[i] = particle[i]
+        # return all([x >= self.min and x < self.max for x in particle])
             
 
 # search_space = Space(1, target_error, n_particles)

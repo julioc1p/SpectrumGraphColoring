@@ -42,10 +42,10 @@ class DSATURGraphColoring(SpectrumGraphColoring):
                 best_c = c
         return best_c
 
-    def _update_saturation_degree(self, vertex,color, semi_coloring):
+    def _update_saturation_degree(self, vertex,color, semi_coloring, is_CSC=False):
         for w in self._graph.neighbours(vertex):
             self._saturation_degree[w]+=1
-            if semi_coloring[w] is None:
+            if semi_coloring[w] is None or is_CSC:
                 for c in self._spectrum:
                     self._color_interference[w][c]+= self._w[color][c]
 
@@ -80,13 +80,17 @@ class DSATURGraphColoring(SpectrumGraphColoring):
 
             for c in self._spectrum:
                 I = self._color_interference[v][c]
+                if len(self._graph.neighbours(v)) == 0:
+                    n_colored+=1
+                    self._update_saturation_degree(v, c, semi_coloring, is_CSC=True)
+                    break
                 if I > self._saturation_degree[v]/len(self._graph.neighbours(v))*t:
                     continue
                 semi_coloring[v] = c
                 if all([1 if not semi_coloring[w] else self._semi_interference(w, semi_coloring) <= \
                     (self._saturation_degree[w]+1)/len(self._graph.neighbours(w))*t for w in self._graph.neighbours(v)]):
                     n_colored+=1
-                    self._update_saturation_degree(v, c, semi_coloring)
+                    self._update_saturation_degree(v, c, semi_coloring, is_CSC=True)
                     break
                 semi_coloring[v] = None
             if not semi_coloring[v]:

@@ -109,6 +109,7 @@ class RandomGraphTester(object):
                 print("Delta: {0}".format(degree.max()))
                 print("Natural norm: {0}".format(algorithm_class._natural_norm()))
                 print("Degree mean: {0}".format(int(degree.mean())))
+                print("Bound: {0}".format(int(degree.max())*algorithm_class._natural_norm()/parameter))
                 print("---------------------------------")
         return {'settings': {
                                 'problem': TSC_OR_CSC,
@@ -132,28 +133,28 @@ class MyEncoder(JSONEncoder):
             print(o)
 
 def full_test():
-    algorithms = {'DSATUR': DSATURGraphColoring, 'PSO': PSOGraphColoring}    
-    for k in [4,6,11]:
+    algorithms = {'DSATUR': DSATURGraphColoring, 'PSO': PSOGraphColoring, 'Random': RandomGraphColoring}    
+    for t in [3]:
         for n in [60, 70, 80]:
             for p in [.1, .5,.9]:
-                # str_t = ''
-                test = RandomGraphTester(n, p, k)
-                # if t == 1:
-                #     str_t = 'np4'
-                #     statistics = test.run_test(n*p/4, algorithms, 20, 10, log=False)
-                # elif t == 2:
-                #     str_t = 'np2'
-                #     statistics = test.run_test(n*p/2, algorithms, 20, 10, log=False)
-                # else:
-                #     str_t = '3np4'
-                #     statistics = test.run_test(3*n*p/4, algorithms, 20, 10, log=False)
-                statistics = test.run_test(k, algorithms, 10, 20, log=False)
+                str_t = ''
+                test = RandomGraphTester(n, p, n)
+                if t == 1:
+                    str_t = 'np4'
+                    statistics = test.run_test(n*p/4, algorithms, 20, 5, TSC_OR_CSC='CSC',log=True)
+                elif t == 2:
+                    str_t = 'np2'
+                    statistics = test.run_test(n*p/2, algorithms, 20, 5, TSC_OR_CSC='CSC', log=False)
+                else:
+                    str_t = '3np4'
+                    statistics = test.run_test(3*n*p/4, algorithms, 20, 5, TSC_OR_CSC='CSC', log=False)
+                # statistics = test.run_test(k, algorithms, 10, 20, log=False)
                 case = 1
                 if p == .5:
                     case = 5
                 if p == .9:
                     case = 9
-                with open(f'test_k{k}_n{n}_p{case}.json', 'w') as handle:
+                with open(f'test_{str_t}_n{n}_p{case}.json', 'w') as handle:
                     handle.write(json.dumps(statistics, cls=MyEncoder))
 
 def test2file(algorithms, color_sizes, vertice_sizes, probabilities, file_name):
@@ -184,16 +185,32 @@ if __name__ == "__main__":
         "blue": {"red": .25, "green": .5, "blue": 1, "violet": .5},
         "violet": {"red": .125, "green": .25, "blue": .5, "violet": 1}        
     }
-    # full_test()
-    iters = 500
-    n_particles = 20
-    c1, c2 = 1.5, 1.5
-    w = 0.5
-    algorithms = {'PSO': PSOGraphColoring}
-    print(f'iters = {iters} n = {n_particles} c1={c1} c2={c2} w={w}')
-    # test2file(algorithms, [4,6,11], [60,70,80], [.1,.5,.9], 'Random vertex with random color')
-    tester = RandomGraphTester(60, .5, 11)
-    tester.run_test(11, algorithms, 10, 5, log=True, TSC_OR_CSC='TSC', swarm_size=n_particles, c1=c1 ,c2=c2, w=w, iterations=iters)
+    full_test()
+    # algorithms = {'DSATUR': DSATURGraphColoring}
+    # solution = {}
+    # for iters in [300, 500]:
+    #     for c1 in [0.5, 1.0, 1.5, 2.0, 3.0]:
+    #         for c2 in [0.5, 1.0, 1.5, 2.0, 3.0]:
+    #             for w in [0.5]:
+    #                 print("---------------------------------")
+    #                 print("---------------------------------")
+    #                 tester = RandomGraphTester(60, .5, 4)
+    #                 print(f'Config i={iters}_c1={c1}_c2={c2}_w={w}')
+    #                 best = tester.run_test(4, algorithms, 10, 5, log=True, TSC_OR_CSC='TSC', swarm_size=15, c1=c1 ,c2=c2, w=w, iterations=iters)
+    #                 solution[f'i={iters}_c1={c1}_c2={c2}_w={w}'] = best
+    # with open('pso_parameters.json', 'w') as handle:
+    #     handle.write(json.dumps(solution, cls=MyEncoder))
+    # for w in [.1, .2,.3,.4, .5,.6, .7,.8, .9,1.0, 1.1, 1.5, 2.0]:
+    # iters = 300
+    # n_particles = 15
+    # c1, c2 = 1.0, 3.0
+    # w = 0.5
+    # print(f'iters = {iters} n = {n_particles} c1={c1} c2={c2} w={w}')
+    # tester = RandomGraphTester(80, .9, 80)
+    # r = []
+    # for _ in range(20):
+    # tester.run_test(18, algorithms, 10, 5, log=True, TSC_OR_CSC='CSC')#, swarm_size=n_particles, c1=c1 ,c2=c2, w=w, iterations=iters)
+    # print(r)
     import os
     freq = 440
     time = 3

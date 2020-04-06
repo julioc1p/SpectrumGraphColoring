@@ -99,8 +99,6 @@ class SpectrumGraphColoring(object):
         """
         nnorm = self._natural_norm()
         Delta = self._graph.Delta()
-        # if len(self._spectrum)*t < Delta*nnorm:
-        #     return -1
         w = [self._w[i].values() for i in self._w]
         w = [item for sublist in w for item in sublist]
         gcd_w = lgcd(w)

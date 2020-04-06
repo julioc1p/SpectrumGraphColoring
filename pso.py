@@ -23,14 +23,6 @@ class PSOGraphColoring(SpectrumGraphColoring):
             in the usual dict representation.
         """
         vertices = self.vertices()
-        # print(len(c))
-        # d = {}
-        # for i in range(len(c)):
-        #     index = int(c[i]-1e-10)
-        #     color = self._spectrum[index]
-        #     v = vertices[i]
-        #     d[v] = color
-        # return d
         return {vertices[i]:self._spectrum[int(c[i]-1e-10)] for i in range(len(c))}
 
     def _opt_fun(self, x, k=4):
@@ -79,7 +71,7 @@ class PSOGraphColoring(SpectrumGraphColoring):
     #     # _, best_c = optimazer.optimize(objective_func=self._opt_fun, iters=iterations, k=k)
     #     return g.search()[1]
     
-    def ThresholdSpectrumColoring(self, k, swarm_size=15, c1=1.5, c2=1.5, w=0.5, iterations=1000):
+    def ThresholdSpectrumColoring(self, k, swarm_size=15, c1=1.0, c2=3.0, w=0.5, iterations=500):
         """ Solution for the TSC problem using a PSO algorithm
             It takes some aditional parameters for the algorithm
         """
@@ -93,11 +85,11 @@ class PSOGraphColoring(SpectrumGraphColoring):
         #                                     bounds=constraints)
         # _, best_c = optimazer.optimize(objective_func=self._opt_fun, iters=iterations, k=k)
         pso = MyPSO(swarm_size, dim, (0, k))
-        _, best_c = pso.minimize(self._opt_fun, iterations , k=k)
+        _, best_c = pso.minimize(self._opt_fun, iterations , w, c1, c2, k=k)
         best_c = self._index2dict(best_c)
         return self.threshold(best_c), best_c
 
-    def ChromaticSpectrumColoring(self, t, swarm_size=10, c1=1.5, c2=1.5, w=0.5, iterations=1000):
+    def ChromaticSpectrumColoring(self, t, swarm_size=15, c1=1.0, c2=3.0, w=0.5, iterations=500):
         """ Solution for the CSC problem using a PSO algorithm
             It takes some aditional parameters for the algorithm
         """
