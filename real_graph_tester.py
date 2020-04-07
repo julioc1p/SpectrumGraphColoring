@@ -11,7 +11,7 @@ from json import JSONEncoder
 
 class RealGraphTester(object):
     def __init__(self, graph, s_size, pow2_mode=False, extra_stats=False):
-        self.graph = graph
+        self._graph = graph
         self._n = len(graph.vertices())
         self._s = s_size
         self._extra_stats = extra_stats
@@ -23,6 +23,8 @@ class RealGraphTester(object):
 
 
     def _make_w(self):
+        """ make the W matrix of interferences using a decay function
+        """
         w = {}
         for i in range(1, self._s+1):
             w[str(i)] = {}
@@ -45,12 +47,16 @@ class RealGraphTester(object):
         return w
 
     def _make_w_pow2(self):
+        """ make the W matrix of interferences using a potential decay 2 function
+        """
         w = {}
         for i in range(1, self._s+1):
             w[str(i)] = { str(j):1/(2**(abs(i-j))) for j in range(1, self._s+1)}
         return w
 
     def _statistics(self, cost_list, time_list, solution_list):
+        """ returns a dict of multiples statistics for a solotion list
+        """
         mean = cost_list.mean()
         std = cost_list.std()
         best_cost, best_s = (1e10, None)
@@ -75,15 +81,20 @@ class RealGraphTester(object):
             }
 
     def run_test(self, parameter, algorithm_class_dict, iters, log=True, TSC_OR_CSC='TSC', *args, **kargs): 
+        """ run a test to solve the TSC or CSC problem specified in 'TSC_OR_CSC',
+            itering 'graph_iters' times in self._graph,
+            while to apply the algorithms in 'algorithm_class_dict' with the parameter
+            'parameter'.
+        """
         costs = { item:np.zeros(iters) for item in algorithm_class_dict}
         times = { item:np.zeros(iters) for item in algorithm_class_dict}
         degree = []
         solutions = { item:[0 for i in range(iters)] for item in algorithm_class_dict }
         timer = Stopwatch()
-        for d in self.graph.degree_sequence():
+        for d in self._graph.degree_sequence():
             degree.append(d)
         for item in algorithm_class_dict:
-            algorithm_class = algorithm_class_dict[item](self.graph, self._spectrum, self._w)
+            algorithm_class = algorithm_class_dict[item](self._graph, self._spectrum, self._w)
             for i in range(iters):
                 timer.restart()
                 if TSC_OR_CSC == 'TSC':
@@ -131,42 +142,6 @@ class MyEncoder(JSONEncoder):
         except:
             print(o)
 
-# def full_test():
-#     algorithms = {'DSATUR': DSATURGraphColoring, 'PSO': PSOGraphColoring, 'Random': RandomGraphColoring}    
-#     for t in [3]:
-#         for n in [60, 70, 80]:
-#             for p in [.1, .5,.9]:
-#                 str_t = ''
-#                 test = RandomGraphTester(n, p, n)
-#                 if t == 1:
-#                     str_t = 'np4'
-#                     statistics = test.run_test(n*p/4, algorithms, 20, 5, TSC_OR_CSC='CSC',log=True)
-#                 elif t == 2:
-#                     str_t = 'np2'
-#                     statistics = test.run_test(n*p/2, algorithms, 20, 5, TSC_OR_CSC='CSC', log=False)
-#                 else:
-#                     str_t = '3np4'
-#                     statistics = test.run_test(3*n*p/4, algorithms, 20, 5, TSC_OR_CSC='CSC', log=False)
-#                 # statistics = test.run_test(k, algorithms, 10, 20, log=False)
-#                 case = 1
-#                 if p == .5:
-#                     case = 5
-#                 if p == .9:
-#                     case = 9
-#                 with open(f'test_{str_t}_n{n}_p{case}.json', 'w') as handle:
-#                     handle.write(json.dumps(statistics, cls=MyEncoder))
-
-# def test2file(algorithms, color_sizes, vertice_sizes, probabilities, file_name):
-#     d = {}
-#     for k in color_sizes:
-#         for n in vertice_sizes:
-#             for p in probabilities:
-#                 test = RandomGraphTester(n, p, k)
-#                 statistics = test.run_test(k, algorithms, 20, 10, log=False)
-#                 d[f'k={k}_n={n}_p={p}'] = statistics
-#     with open(f'{file_name}.json', 'w') as handle:
-#         handle.write(json.dumps(d, cls=MyEncoder))
-
 
 if __name__ == "__main__":
 
@@ -176,16 +151,8 @@ if __name__ == "__main__":
         "c": ["a", "b", "d"],
         "d": ["c"]
     }
-    graph = Graph(g)
-    S = ["red", "green", "blue", "violet"]
-    W = {
-        "red": {"red": 1, "green": .5, "blue": .25, "violet":.125},
-        "green": {"red": .5, "green": 1, "blue": .5, "violet": .25},
-        "blue": {"red": .25, "green": .5, "blue": 1, "violet": .5},
-        "violet": {"red": .125, "green": .25, "blue": .5, "violet": 1}        
-    }
 
-    BD = {
+    LD = {
             '1': ['2', '3', '4', '5'],
             '2': ['1', '3', '4', '5', '6'],
             '3': ['1', '2', '4', '5', '6'],
@@ -206,44 +173,18 @@ if __name__ == "__main__":
             '18': ['16', '17']
     }
 
-    
-    AD = {
-            '1': ['2', '3', '4', '5', '6', '7'], #6
-            '2': ['1', '3', '4', '5', '6', '7', '24', '26'], #8
-            '3': ['1', '2', '4', '5', '6', '7', '9', '13', '15', '22', '24'], #11
-            '4': ['1', '2', '3', '5', '7', '9', '13', '15', '22', '24', '25', '26'],#13
-            '5': ['1', '2', '3', '4', '6', '7', '8', '9'], #8
-            '6': ['1', '2', '3', '5', '7', '8', '9', '10', '11', '13'], #10            
-            '7': ['1', '2', '3', '4', '5', '6', '8', '9', '11', '13', '15', '22', '24'], #13
-            '8': ['5', '6', '7', '9', '10', '11', '13', '14'], #8
-            '9': ['3', '4', '5', '6','7', '8', '10', '11', '13', '14', '15', '16', '22'],#13
-            '10': ['6', '8', '9', '11', '13', '14'], #6
-            '11': ['6', '8', '9', '10', '13', '14', '15'],#7
-            # '12': ['8', '9', '10', '11', '13', '14', '16'], #7
-            '13': ['3', '4', '6', '7', '8', '9', '10', '11', '14', '15', '16', '17', '22'],#13
-            '14': ['8', '9', '10', '11', '13', '15', '16', '17', '18', '22'], #10
-            '15': ['3', '4', '7', '9', '11', '13', '14', '16', '17', '18', '21', '22', '23', '24', '25'],#14
-            '16': ['9', '13', '14', '15', '17', '18', '19', '20', '21', '22', '23'],#11
-            '17': ['13', '14', '15', '16', '18', '19', '20', '21', '22', '23', '24'],#11
-            '18': ['14', '15', '16', '17', '19', '20', '21', '22', '23'],#9
-            '19': ['16', '17', '18', '20', '21', '22', '23'],#7
-            '20': ['16', '17', '18', '19', '21', '22'],#6
-            '21': ['15', '16', '17', '18', '19', '20', '22', '23', '24', '25'],#10
-            '22': ['3', '4', '7', '9', '13', '14', '15', '16', '17', '18', '19', '20', '21', '23', '24', '25', '26'],#17
-            '23': ['15', '16', '17', '18', '19' ,'21', '22', '24', '25', '26'],#10
-            '24': ['2', '3', '4', '7', '15', '17', '21', '22', '23', '25', '26'],#11
-            '25': ['4', '15', '21', '22', '23', '24', '26'],#7
-            '26': ['2', '4' , '22', '23', '24', '25']#6
-    }
-
-    # graph = Graph(AD)
     algorithms = {'RANDOM': RandomGraphColoring, 'DSATUR': DSATURGraphColoring, 'PSO': PSOGraphColoring}
+    print("_________________________________")
+    print("---------------------------------")
+    print('Case 1:')
+    graph = Graph(g)
+    print(graph)
     tester = RealGraphTester(graph, 4)
-    tester.run_test(4, algorithms, 10)
-    import os
-    freq = 440
-    time = 3
-    os.system('play -nq -t alsa synth {}'.format(time, freq))
-
-    # encoder = MyEncoder().encode(graph)
-    # print(encoder)
+    tester.run_test(4, algorithms, 100)
+    print("_________________________________")
+    print("---------------------------------")
+    print('Case 2:')
+    graph = Graph(LD)
+    print(graph)
+    tester = RealGraphTester(graph, 11)
+    tester.run_test(11, algorithms, 100)

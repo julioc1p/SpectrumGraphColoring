@@ -18,7 +18,10 @@ class RandomGraphTester(object):
         self._w = self._make_w()
         self._spectrum = [str(i) for i in range(1, s_size+1)]
 
-    def make_graph(self):
+    def _make_graph(self):
+        """ returns a random graph with self._n vertices and average 
+            degree self._n*self._p
+        """
         graph = np.zeros((self._n+1, self._n+1))
         for i in range(1, self._n+1):
             for j in range(i+1, self._n+1):
@@ -34,12 +37,16 @@ class RandomGraphTester(object):
         return Graph(graph_dict)
 
     def _make_w(self):
+        """ make the W matrix of interferences using a potential decay 2 function
+        """
         w = {}
         for i in range(1, self._s+1):
             w[str(i)] = { str(j):1/(2**(abs(i-j))) for j in range(1, self._s+1)}
         return w
 
     def _statistics(self, cost_list, time_list, solution_list):
+        """ returns a dict of multiples statistics for a solotion list
+        """
         mean = cost_list.mean()
         std = cost_list.std()
         min_by_iteration = []
@@ -68,7 +75,12 @@ class RandomGraphTester(object):
                 'time': time_list.mean()
             }
 
-    def run_test(self, parameter, algorithm_class_dict, n_graph, graph_iters, log=True, TSC_OR_CSC='TSC', *args, **kargs): 
+    def run_test(self, parameter, algorithm_class_dict, n_graph, graph_iters, log=True, TSC_OR_CSC='TSC', *args, **kargs):
+        """ run a test to solve the TSC or CSC problem specified in 'TSC_OR_CSC',
+            making 'n_graph' different graphs itering 'graph_iters' times in every one,
+            while to apply the algorithms in 'algorithm_class_dict' with the parameter
+            'parameter'.
+        """
         costs = { item:np.zeros((n_graph, graph_iters)) for item in algorithm_class_dict}
         times = { item:np.zeros((n_graph, graph_iters)) for item in algorithm_class_dict}
         degree = []
@@ -78,7 +90,7 @@ class RandomGraphTester(object):
                     }
         timer = Stopwatch()
         for i in range(n_graph):
-            graph = self.make_graph()
+            graph = self._make_graph()
             for d in graph.degree_sequence():
                 degree.append(d)
             for item in algorithm_class_dict:
@@ -132,89 +144,18 @@ class MyEncoder(JSONEncoder):
         except:
             print(o)
 
-def full_test():
-    algorithms = {'DSATUR': DSATURGraphColoring, 'Random': RandomGraphColoring}    
-    for t in [3]:
-        for n in [80]:
-            for p in [.1]:
-                str_t = ''
-                test = RandomGraphTester(n, p, n)
-                if t == 1:
-                    str_t = 'np4'
-                    statistics = test.run_test(n*p/4, algorithms, 20, 10, TSC_OR_CSC='CSC',log=False)
-                elif t == 2:
-                    str_t = 'np2'
-                    statistics = test.run_test(n*p/2, algorithms, 20, 10, TSC_OR_CSC='CSC', log=False)
-                else:
-                    str_t = '3np4'
-                    statistics = test.run_test(3*n*p/4, algorithms, 20, 10, TSC_OR_CSC='CSC', log=False)
-                # statistics = test.run_test(k, algorithms, 10, 20, log=False)
-                case = 1
-                if p == .5:
-                    case = 5
-                if p == .9:
-                    case = 9
-                with open(f'test_{str_t}_n{n}_p{case}.json', 'w') as handle:
-                    handle.write(json.dumps(statistics, cls=MyEncoder))
-
-def test2file(algorithms, color_sizes, vertice_sizes, probabilities, file_name):
-    d = {}
-    for k in color_sizes:
-        for n in vertice_sizes:
-            for p in probabilities:
-                test = RandomGraphTester(n, p, k)
-                statistics = test.run_test(k, algorithms, 20, 10, log=False)
-                d[f'k={k}_n={n}_p={p}'] = statistics
-    with open(f'{file_name}.json', 'w') as handle:
-        handle.write(json.dumps(d, cls=MyEncoder))
-
 
 if __name__ == "__main__":
 
-    g = {
-        "a": ["b", "c"],
-        "b": ["a", "c"],
-        "c": ["a", "b", "d"],
-        "d": ["c"]
-    }
-    graph = Graph(g)
-    S = ["red", "green", "blue", "violet"]
-    W = {
-        "red": {"red": 1, "green": .5, "blue": .25, "violet":.125},
-        "green": {"red": .5, "green": 1, "blue": .5, "violet": .25},
-        "blue": {"red": .25, "green": .5, "blue": 1, "violet": .5},
-        "violet": {"red": .125, "green": .25, "blue": .5, "violet": 1}        
-    }
-    full_test()
-    # algorithms = {'DSATUR': DSATURGraphColoring}
-    # solution = {}
-    # for iters in [300, 500]:
-    #     for c1 in [0.5, 1.0, 1.5, 2.0, 3.0]:
-    #         for c2 in [0.5, 1.0, 1.5, 2.0, 3.0]:
-    #             for w in [0.5]:
-    #                 print("---------------------------------")
-    #                 print("---------------------------------")
-    #                 tester = RandomGraphTester(60, .5, 4)
-    #                 print(f'Config i={iters}_c1={c1}_c2={c2}_w={w}')
-    #                 best = tester.run_test(4, algorithms, 10, 5, log=True, TSC_OR_CSC='TSC', swarm_size=15, c1=c1 ,c2=c2, w=w, iterations=iters)
-    #                 solution[f'i={iters}_c1={c1}_c2={c2}_w={w}'] = best
-    # with open('pso_parameters.json', 'w') as handle:
-    #     handle.write(json.dumps(solution, cls=MyEncoder))
-    # for w in [.1, .2,.3,.4, .5,.6, .7,.8, .9,1.0, 1.1, 1.5, 2.0]:
-    # iters = 300
-    # n_particles = 15
-    # c1, c2 = 1.0, 3.0
-    # w = 0.5
-    # print(f'iters = {iters} n = {n_particles} c1={c1} c2={c2} w={w}')
-    # tester = RandomGraphTester(80, .9, 80)
-    # r = []
-    # for _ in range(20):
-    # tester.run_test(18, algorithms, 10, 5, log=True, TSC_OR_CSC='CSC')#, swarm_size=n_particles, c1=c1 ,c2=c2, w=w, iterations=iters)
-    # print(r)
-    import os
-    freq = 440
-    time = 3
-    os.system('play -nq -t alsa synth {}'.format(time, freq))
 
-    # encoder = MyEncoder().encode(graph)
-    # print(encoder)
+    algorithms = {'RANDOM': RandomGraphColoring, 'DSATUR': DSATURGraphColoring, 'PSO': PSOGraphColoring}
+    print("_________________________________")
+    print("---------------------------------")
+    print("TSC")
+    tester = RandomGraphTester(60, .5, 11)
+    tester.run_test(11, algorithms, 10, 5, log=True)
+    print("_________________________________")
+    print("---------------------------------")
+    print("CSC")
+    tester = RandomGraphTester(60, .5, 60)
+    tester.run_test(15, algorithms, 10, 5, log=True, TSC_OR_CSC='CSC')

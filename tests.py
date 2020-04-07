@@ -7,6 +7,9 @@ from random_graph_tester import RandomGraphTester
 from real_graph_tester import RealGraphTester
 import json
 
+""" Experiments for random and real case graphs for the
+    TSC and CSC problems, using different techniques
+"""
 
 simple_graph = {
         "a": ["b", "c"],
@@ -241,8 +244,8 @@ if __name__ == "__main__":
     ## Tests for real graphs
     ##############################################
 
-    # test_for_ld_graph() # test for a real low-density graph
-    test_for_hd_graph() # test for a real high-density graph
+    test_for_ld_graph() # test for a real low-density graph
+    # test_for_hd_graph() # test for a real high-density graph
 
     import os
     freq = 440

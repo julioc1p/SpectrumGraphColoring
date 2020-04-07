@@ -82,12 +82,12 @@ if __name__ == "__main__":
     sgraph = PSOGraphColoring(graph, S, W)
 
     k0 = 3
-    # t0 = 1.0
+    t0 = 1.0
     t = sgraph.ThresholdSpectrumColoring(k0)
-    # k = sgraph.ChromaticSpectrumColoring(t0)
-    # print('Graph:')
-    # print(sgraph)
+    k = sgraph.ChromaticSpectrumColoring(t0)
+    print('Graph:')
+    print(sgraph)
     print(f'PSO best value and coloring for the TSC problem and k = {k0}:')
     print(t)
-    # print(f'PSO best value and coloring for the TSC problem and t = {t0}:')
-    # print(k)
+    print(f'PSO best value and coloring for the TSC problem and t = {t0}:')
+    print(k)
