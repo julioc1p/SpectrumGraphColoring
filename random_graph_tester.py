@@ -133,21 +133,21 @@ class MyEncoder(JSONEncoder):
             print(o)
 
 def full_test():
-    algorithms = {'DSATUR': DSATURGraphColoring, 'PSO': PSOGraphColoring, 'Random': RandomGraphColoring}    
+    algorithms = {'DSATUR': DSATURGraphColoring, 'Random': RandomGraphColoring}    
     for t in [3]:
-        for n in [60, 70, 80]:
-            for p in [.1, .5,.9]:
+        for n in [80]:
+            for p in [.1]:
                 str_t = ''
                 test = RandomGraphTester(n, p, n)
                 if t == 1:
                     str_t = 'np4'
-                    statistics = test.run_test(n*p/4, algorithms, 20, 5, TSC_OR_CSC='CSC',log=True)
+                    statistics = test.run_test(n*p/4, algorithms, 20, 10, TSC_OR_CSC='CSC',log=False)
                 elif t == 2:
                     str_t = 'np2'
-                    statistics = test.run_test(n*p/2, algorithms, 20, 5, TSC_OR_CSC='CSC', log=False)
+                    statistics = test.run_test(n*p/2, algorithms, 20, 10, TSC_OR_CSC='CSC', log=False)
                 else:
                     str_t = '3np4'
-                    statistics = test.run_test(3*n*p/4, algorithms, 20, 5, TSC_OR_CSC='CSC', log=False)
+                    statistics = test.run_test(3*n*p/4, algorithms, 20, 10, TSC_OR_CSC='CSC', log=False)
                 # statistics = test.run_test(k, algorithms, 10, 20, log=False)
                 case = 1
                 if p == .5:

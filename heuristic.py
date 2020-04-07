@@ -138,32 +138,32 @@ class DSATURGraphColoring(SpectrumGraphColoring):
 if __name__ == "__main__":
     
 
-    g = {
-        "a": ["b", "c"],
-        "b": ["a", "c"],
-        "c": ["a", "b", "d"],
-        "d": ["c"]
-    }
-    graph = Graph(g)
-    S = ["red", "green", "blue", "violet"]
-    W = {
-        "red": {"red": 1, "green": .5, "blue": .25, "violet":.125},
-        "green": {"red": .5, "green": 1, "blue": .5, "violet": .25},
-        "blue": {"red": .25, "green": .5, "blue": 1, "violet": .5},
-        "violet": {"red": .125, "green": .25, "blue": .5, "violet": 1}        
-    }
-    sgraph = DSATURGraphColoring(graph, S, W)
+    # g = {
+    #     "a": ["b", "c"],
+    #     "b": ["a", "c"],
+    #     "c": ["a", "b", "d"],
+    #     "d": ["c"]
+    # }
+    # graph = Graph(g)
+    # S = ["red", "green", "blue", "violet"]
+    # W = {
+    #     "red": {"red": 1, "green": .5, "blue": .25, "violet":.125},
+    #     "green": {"red": .5, "green": 1, "blue": .5, "violet": .25},
+    #     "blue": {"red": .25, "green": .5, "blue": 1, "violet": .5},
+    #     "violet": {"red": .125, "green": .25, "blue": .5, "violet": 1}        
+    # }
+    # sgraph = DSATURGraphColoring(graph, S, W)
 
-    print('Graph:')
-    print(sgraph)
+    # print('Graph:')
+    # print(sgraph)
 
-    k = 3
-    t = sgraph.ChromaticSpectrumColoring(1)
-    print(f'PSO best value and coloring for the TSC problem and k = {k}:')
-    print(t)
+    # k = 3
+    # t = sgraph.ChromaticSpectrumColoring(1)
+    # print(f'PSO best value and coloring for the TSC problem and k = {k}:')
+    # print(t)
 
     
-    LD = {
+    BD = {
             '1': ['2', '3', '4', '5'],
             '2': ['1', '3', '4', '5', '6'],
             '3': ['1', '2', '4', '5', '6'],
@@ -236,9 +236,9 @@ if __name__ == "__main__":
         W[str(i)] = w_
     S = [str(i) for i in range(1,12)]
 
-    graph = Graph(LD)
+    graph = Graph(BD)
     sgraph = DSATURGraphColoring(graph, S, W)
-    print(sgraph.ChromaticSpectrumColoring(2))
+    print(sgraph.ThresholdSpectrumColoring(11))
     # # print('Graph:')
     # # print(sgraph)
 

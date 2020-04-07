@@ -5,6 +5,7 @@ from graph2 import Graph
 from mypso import MyPSO
 import psopy
 
+
 """ A Python class
     A Python graph class which inherites of SpectrumGraphColoring class
     and solves its TSC and CSC problems using an optimizer based in
@@ -25,68 +26,25 @@ class PSOGraphColoring(SpectrumGraphColoring):
         vertices = self.vertices()
         return {vertices[i]:self._spectrum[int(c[i]-1e-10)] for i in range(len(c))}
 
-    def _opt_fun(self, x, k=4):
+    def _opt_fun(self, x, k):
         """ function of optimization used for the PSO algorithm,
-            where "x" is the swarm vector and "k" is the k from the
+            where "x" is a vector and "k" is the k from the
             self.ThresholdSpectrumColoring method, .i.e the color number.    
         """
-        n_vertices = x.shape[0] # Dimension of the vectors
-        vertices = self.vertices()
-
-        coloring = self._index2dict(x)
+        coloring = self._index2dict(x) # corverting the coloring to the dict representation
+        # Case when the coloring has more than k colors, so it is not valid
         if len(set(coloring.values())) > k:
             return 1e10
         return np.array(sum([self.vertex_interference(v, coloring) for v in self.vertices()]))
 
-        weights = [] # weights array which will be returned
-        # It is important to explain that we use a index representation of
-        # the colorings, because it is more efficient for the PSO's computations
-        for c in x:
-            coloring = self._index2dict(c) # corverting the coloring to the dict representation
-            # case when the coloring has more than k colors
-            if len(set(coloring.values())) > k:
-                weights.append(1000000)
-            else:
-                weights.append(sum([self.vertex_interference(vertices[i], coloring) for i in range(n_vertices)]))
-        return np.array(weights)
-
-    # def best_hyperparameter_search(self, swarm_size=10, iterations=1000):
-    #     from pyswarms.utils.search import RandomSearch
-    #     dim = len(self.vertices()) # Dimension of vector X
-    #     constraints = (0*np.ones(dim), len(self._spectrum)*np.ones(dim)) # limits for the vector values
-    #     options = {
-    #         'c1': [1, 5],
-    #         'c2': [6, 10],
-    #         'w': [2, 5],
-    #         'k': [11, 15],
-    #         'p': 1
-    #     }
-    #     g = RandomSearch(ps.single.GlobalBestPSO, 
-    #                                         n_particles=swarm_size,
-    #                                         dimensions=dim,
-    #                                         options=options,
-    #                                         iters=iterations,
-    #                                         n_selection_iters=100,
-    #                                         objective_func=self._opt_fun)
-    #     # _, best_c = optimazer.optimize(objective_func=self._opt_fun, iters=iterations, k=k)
-    #     return g.search()[1]
-    
     def ThresholdSpectrumColoring(self, k, swarm_size=15, c1=1.0, c2=3.0, w=0.5, iterations=500):
         """ Solution for the TSC problem using a PSO algorithm
             It takes some aditional parameters for the algorithm
         """
-        # Setting up the parameters for the algorithm
         dim = len(self.vertices()) # Dimension of vector X
-        # constraints = (0*np.ones(dim), k*np.ones(dim)) # limits for the vector values
-        # options = {'c1': c1, 'c2':c2, 'w':w}
-        # optimazer = ps.single.GlobalBestPSO(n_particles=swarm_size,
-        #                                     dimensions=dim,
-        #                                     options=options,
-        #                                     bounds=constraints)
-        # _, best_c = optimazer.optimize(objective_func=self._opt_fun, iters=iterations, k=k)
-        pso = MyPSO(swarm_size, dim, (0, k))
-        _, best_c = pso.minimize(self._opt_fun, iterations , w, c1, c2, k=k)
-        best_c = self._index2dict(best_c)
+        pso = MyPSO(swarm_size, dim, (0, k)) # PSO object which sets up the dimensions and vector limits
+        _, best_c = pso.minimize(self._opt_fun, iterations , w, c1, c2, k=k) 
+        best_c = self._index2dict(best_c) # corverting the coloring to the dict representation
         return self.threshold(best_c), best_c
 
     def ChromaticSpectrumColoring(self, t, swarm_size=15, c1=1.0, c2=3.0, w=0.5, iterations=500):

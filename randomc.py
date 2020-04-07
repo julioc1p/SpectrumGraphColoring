@@ -2,6 +2,12 @@ from graph_coloring import SpectrumGraphColoring
 from graph2 import Graph
 from random import choice
 
+
+""" A Python class
+    A Python graph class which inherites of SpectrumGraphColoring class
+    and solves its TSC and CSC problems using a random strategy
+"""
+
 class RandomGraphColoring(SpectrumGraphColoring):
 
     def __init__(self, graph, spectrum, w, c=None):

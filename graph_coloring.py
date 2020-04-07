@@ -1,6 +1,7 @@
 from graph2 import Graph
 from gcd import lgcd
 
+
 """ A Python Class
     A Python graph class for two Spectrum Graph Coloring problems,
     the Threshold Spectrum Coloring problem and the Chromatic Spectrum
