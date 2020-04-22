@@ -3,6 +3,7 @@ from graph2 import Graph
 from pso import PSOGraphColoring
 from heuristic import DSATURGraphColoring
 from randomc import RandomGraphColoring
+from new_heuristic import MyGraphColoring
 from random_graph_tester import RandomGraphTester
 from real_graph_tester import RealGraphTester
 import json
@@ -135,7 +136,7 @@ def simple_tsc_test():
     algorithms = {'RANDOM': RandomGraphColoring, 'DSATUR': DSATURGraphColoring, 'PSO': PSOGraphColoring}
     tsc_test(algorithms, simple_graph, 4, 10, 4, pow2=True)
 
-# TSC simple tests
+# CSC simple tests
 def simple_csc_test():
     print("_________________________________")
     print("---------------------------------")
@@ -169,7 +170,7 @@ def test_for_ld_graph(save_file=False):
     print("---------------------------------")
     print('Test for LD graph with TSC')
     graph = Graph(LD)
-    algorithms = {'RANDOM': RandomGraphColoring, 'DSATUR': DSATURGraphColoring, 'PSO': PSOGraphColoring}
+    algorithms = {'RANDOM': RandomGraphColoring, 'DSATUR': DSATURGraphColoring, 'My': MyGraphColoring, 'PSO': PSOGraphColoring}
     statistics = tsc_test(algorithms, graph, 11, 100, 11)
     if save_file is True:
         with open('test_for_real_case_ld.json', 'w') as handle:
@@ -209,7 +210,7 @@ def test_for_hd_graph(save_file=False):
     print("---------------------------------")
     print('Test for HD graph with TSC')
     graph = Graph(HD)
-    algorithms = {'RANDOM': RandomGraphColoring, 'DSATUR': DSATURGraphColoring, 'PSO': PSOGraphColoring}
+    algorithms = {'RANDOM': RandomGraphColoring, 'DSATUR': DSATURGraphColoring, 'My': MyGraphColoring, 'PSO': PSOGraphColoring}
     statistics = tsc_test(algorithms, graph, 11, 100, 11)
     if save_file is True:
         with open('test_for_real_case_hd.json', 'w') as handle:
@@ -245,7 +246,7 @@ if __name__ == "__main__":
     ##############################################
 
     test_for_ld_graph() # test for a real low-density graph
-    # test_for_hd_graph() # test for a real high-density graph
+    test_for_hd_graph() # test for a real high-density graph
 
     import os
     freq = 440

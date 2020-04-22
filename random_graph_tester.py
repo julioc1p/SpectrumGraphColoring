@@ -9,6 +9,7 @@ import random
 import json
 from json import JSONEncoder
 
+
 class RandomGraphTester(object):
     def __init__(self, n_vertices, conn_prob, s_size, extra_stats=False):
         self._n = n_vertices
@@ -147,15 +148,15 @@ class MyEncoder(JSONEncoder):
 
 if __name__ == "__main__":
 
-
-    algorithms = {'RANDOM': RandomGraphColoring, 'DSATUR': DSATURGraphColoring, 'PSO': PSOGraphColoring}
+    from new_heuristic import MyGraphColoring
+    algorithms = {'RANDOM': RandomGraphColoring, 'DSATUR': DSATURGraphColoring, 'My': MyGraphColoring}
     print("_________________________________")
     print("---------------------------------")
     print("TSC")
-    tester = RandomGraphTester(60, .5, 11)
-    tester.run_test(11, algorithms, 10, 5, log=True)
-    print("_________________________________")
-    print("---------------------------------")
-    print("CSC")
-    tester = RandomGraphTester(60, .5, 60)
-    tester.run_test(15, algorithms, 10, 5, log=True, TSC_OR_CSC='CSC')
+    tester = RandomGraphTester(80, .9, 11)
+    tester.run_test(11, algorithms, 10, 20, log=True)
+    # print("_________________________________")
+    # print("---------------------------------")
+    # print("CSC")
+    # tester = RandomGraphTester(60, .5, 60)
+    # tester.run_test(15, algorithms, 10, 5, log=True, TSC_OR_CSC='CSC')
