@@ -12,6 +12,13 @@ import json
     TSC and CSC problems, using different techniques
 """
 
+algorithms = {
+    'RANDOM': RandomGraphColoring, 
+    'DSATUR': DSATURGraphColoring, 
+    'VM': VertexMergeGraphColoring}
+    # 'PSO': PSOGraphColoring}
+
+
 simple_graph = {
         "a": ["b", "c"],
         "b": ["a", "c"],
@@ -34,7 +41,7 @@ def tsc_simple_test_for_random_graph(save_file=False):
     print("_________________________________")
     print("---------------------------------")
     print('TSC simple test for random graphs')
-    algorithms = {'RANDOM': RandomGraphColoring, 'DSATUR': DSATURGraphColoring, 'PSO': PSOGraphColoring}
+    global algorithms
     statistics = tsc_test_for_random_graph(algorithms, 60, 0.5, 4, 5, 3, 4)
     if save_file is True:
         with open('tsc_simple_test_for_random_graph.json', 'w') as handle:
@@ -44,7 +51,7 @@ def tsc_medium_test_for_random_graph(save_file=False):
     print("_________________________________")
     print("---------------------------------")
     print('TSC medium test for random graphs')
-    algorithms = {'RANDOM': RandomGraphColoring, 'DSATUR': DSATURGraphColoring, 'PSO': PSOGraphColoring}
+    global algorithms    
     statistics = tsc_test_for_random_graph(algorithms, 60, 0.5, 11, 10, 5, 11)
     if save_file is True:
         with open('tsc_medium_test_for_random_graph.json', 'w') as handle:
@@ -54,14 +61,14 @@ def tsc_complex_test_for_random_graph(save_file=False):
     print("_________________________________")
     print("---------------------------------")
     print('TSC complex test for random graphs')
-    algorithms = {'RANDOM': RandomGraphColoring, 'DSATUR': DSATURGraphColoring, 'PSO': PSOGraphColoring}
+    global algorithms    
     statistics = tsc_test_for_random_graph(algorithms, 80, 0.9, 11, 20, 10, 11)
     if save_file is True:
         with open('tsc_complex_test_for_random_graph.json', 'w') as handle:
             handle.write(json.dumps(statistics))
 
 def tsc_full_test_for_random_graph(save_file=True):
-    algorithms = {'RANDOM': RandomGraphColoring, 'DSATUR': DSATURGraphColoring, 'PSO': PSOGraphColoring}
+    global algorithms    
     statistics = {}
     for k in [4, 6, 11]:
         for n in [60, 70, 80]:
@@ -77,7 +84,7 @@ def csc_simple_test_for_random_graph(save_file=False):
     print("_________________________________")
     print("---------------------------------")
     print('CSC simple test for random graphs')
-    algorithms = {'RANDOM': RandomGraphColoring, 'DSATUR': DSATURGraphColoring, 'PSO': PSOGraphColoring}
+    global algorithms
     statistics = csc_test_for_random_graph(algorithms, 60, 0.5, 60, 5, 3, 22.5)
     if save_file is True:
         with open('csc_simple_test_for_random_graph.json', 'w') as handle:
@@ -87,7 +94,7 @@ def csc_medium_test_for_random_graph(save_file=False):
     print("_________________________________")
     print("---------------------------------")
     print('CSC medium test for random graphs')
-    algorithms = {'RANDOM': RandomGraphColoring, 'DSATUR': DSATURGraphColoring, 'PSO': PSOGraphColoring}
+    global algorithms    
     statistics = csc_test_for_random_graph(algorithms, 60, 0.5, 60, 10, 5, 15)
     if save_file is True:
         with open('csc_medium_test_for_random_graph.json', 'w') as handle:
@@ -97,14 +104,14 @@ def csc_complex_test_for_random_graph(save_file=False):
     print("_________________________________")
     print("---------------------------------")
     print('CSC complex test for random graphs')
-    algorithms = {'RANDOM': RandomGraphColoring, 'DSATUR': DSATURGraphColoring, 'PSO': PSOGraphColoring}
+    global algorithms    
     statistics = csc_test_for_random_graph(algorithms, 80, 0.9, 80, 20, 10, 18)
     if save_file is True:
         with open('csc_complex_test_for_random_graph.json', 'w') as handle:
             handle.write(json.dumps(statistics))
 
 def csc_full_test_for_random_graph(save_file=True):
-    algorithms = {'RANDOM': RandomGraphColoring, 'DSATUR': DSATURGraphColoring, 'PSO': PSOGraphColoring}
+    global algorithms    
     statistics = {}
     for t in ['np/4', 'np/2', '3np/4']:
         for n in [60, 70, 80]:
@@ -133,7 +140,7 @@ def simple_tsc_test():
     print("_________________________________")
     print("---------------------------------")
     print('Simple TSC test')
-    algorithms = {'RANDOM': RandomGraphColoring, 'DSATUR': DSATURGraphColoring, 'PSO': PSOGraphColoring}
+    global algorithms    
     tsc_test(algorithms, simple_graph, 4, 10, 4, pow2=True)
 
 # CSC simple tests
@@ -141,7 +148,7 @@ def simple_csc_test():
     print("_________________________________")
     print("---------------------------------")
     print('Simple CSC test')
-    algorithms = {'RANDOM': RandomGraphColoring, 'DSATUR': DSATURGraphColoring, 'PSO': PSOGraphColoring}
+    global algorithms    
     csc_test(algorithms, simple_graph, 4, 10, 1, pow2=True)
 
 # Real case of LD graph
@@ -170,7 +177,7 @@ def test_for_ld_graph(save_file=False):
     print("---------------------------------")
     print('Test for LD graph with TSC')
     graph = Graph(LD)
-    algorithms = {'RANDOM': RandomGraphColoring, 'DSATUR': DSATURGraphColoring, 'VM': VertexMergeGraphColoring, 'PSO': PSOGraphColoring}
+    global algorithms
     statistics = tsc_test(algorithms, graph, 11, 100, 11)
     if save_file is True:
         with open('test_for_real_case_ld.json', 'w') as handle:
@@ -210,7 +217,7 @@ def test_for_hd_graph(save_file=False):
     print("---------------------------------")
     print('Test for HD graph with TSC')
     graph = Graph(HD)
-    algorithms = {'RANDOM': RandomGraphColoring, 'DSATUR': DSATURGraphColoring, 'VM': VertexMergeGraphColoring, 'PSO': PSOGraphColoring}
+    global algorithms
     statistics = tsc_test(algorithms, graph, 11, 100, 11)
     if save_file is True:
         with open('test_for_real_case_hd.json', 'w') as handle:
