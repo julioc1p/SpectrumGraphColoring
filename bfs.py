@@ -155,7 +155,7 @@ if __name__ == "__main__":
         "blue": {"red": .25, "green": .5, "blue": 1, "violet": .5},
         "violet": {"red": .125, "green": .25, "blue": .5, "violet": 1}        
     }
-    sgraph = DSATURGraphColoring(graph, S, W)
+    sgraph = BFSGraphColoring(graph, S, W)
 
     k0 = 3
     t0 = 1.0
