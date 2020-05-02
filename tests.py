@@ -4,6 +4,7 @@ from pso import PSOGraphColoring
 from dsatur import DSATURGraphColoring
 from randomc import RandomGraphColoring
 from vertex_merge import VertexMergeGraphColoring
+from bfs import BFSGraphColoring
 from random_graph_tester import RandomGraphTester
 from real_graph_tester import RealGraphTester
 import json
@@ -15,7 +16,8 @@ import json
 algorithms = {
     'RANDOM': RandomGraphColoring, 
     'DSATUR': DSATURGraphColoring, 
-    'VM': VertexMergeGraphColoring}
+    'VM': VertexMergeGraphColoring,
+    'BFS': BFSGraphColoring }
     # 'PSO': PSOGraphColoring}
 
 
