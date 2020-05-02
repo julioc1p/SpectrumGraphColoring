@@ -3,7 +3,7 @@ from graph2 import Graph
 from pso import PSOGraphColoring
 from dsatur import DSATURGraphColoring
 from randomc import RandomGraphColoring
-from new_heuristic import MyGraphColoring
+from vertex_merge import VertexMergeGraphColoring
 from random_graph_tester import RandomGraphTester
 from real_graph_tester import RealGraphTester
 import json
@@ -170,7 +170,7 @@ def test_for_ld_graph(save_file=False):
     print("---------------------------------")
     print('Test for LD graph with TSC')
     graph = Graph(LD)
-    algorithms = {'RANDOM': RandomGraphColoring, 'DSATUR': DSATURGraphColoring, 'My': MyGraphColoring, 'PSO': PSOGraphColoring}
+    algorithms = {'RANDOM': RandomGraphColoring, 'DSATUR': DSATURGraphColoring, 'VM': VertexMergeGraphColoring, 'PSO': PSOGraphColoring}
     statistics = tsc_test(algorithms, graph, 11, 100, 11)
     if save_file is True:
         with open('test_for_real_case_ld.json', 'w') as handle:
@@ -210,7 +210,7 @@ def test_for_hd_graph(save_file=False):
     print("---------------------------------")
     print('Test for HD graph with TSC')
     graph = Graph(HD)
-    algorithms = {'RANDOM': RandomGraphColoring, 'DSATUR': DSATURGraphColoring, 'My': MyGraphColoring, 'PSO': PSOGraphColoring}
+    algorithms = {'RANDOM': RandomGraphColoring, 'DSATUR': DSATURGraphColoring, 'VM': VertexMergeGraphColoring, 'PSO': PSOGraphColoring}
     statistics = tsc_test(algorithms, graph, 11, 100, 11)
     if save_file is True:
         with open('test_for_real_case_hd.json', 'w') as handle:

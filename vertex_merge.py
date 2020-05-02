@@ -10,7 +10,7 @@ from graph2 import Graph
     and solves its TSC and CSC problems using a DSATUR-based heuristic.
 """
 
-class MyGraphColoring(SpectrumGraphColoring):
+class VertexMergeGraphColoring(SpectrumGraphColoring):
 
     def __init__(self, graph, spectrum, w, c=None):
         super().__init__(graph, spectrum, w, c)
@@ -35,20 +35,6 @@ class MyGraphColoring(SpectrumGraphColoring):
                 v = vertices[index]
             index+=1
         return v
-        # best_v = []
-        # for v in self.vertices():
-        #     if not semi_coloring[v]:
-        #         if not best_v:
-        #             best_v = [v]
-        #         if self._vertex_degree[v] > self._vertex_degree[best_v[0]]:
-        #             best_v = [v]
-        #         elif self._vertex_degree[v] == self._vertex_degree[best_v[0]] and \
-        #                 self._saturation_degree[v] > self._saturation_degree[best_v[0]]:
-        #             best_v = [v]
-        #         elif self._saturation_degree[v] == self._saturation_degree[best_v[0]] and \
-        #                 self._vertex_degree[v] == self._vertex_degree[best_v[0]]:
-        #             best_v.append(v)
-        # return random.choice(best_v)
 
     def _min_semi_interference(self, vertex, semi_coloring, spectrum):
         """ calculates the color with the lowest potential interference in the 
@@ -76,7 +62,7 @@ class MyGraphColoring(SpectrumGraphColoring):
                 for c in self._spectrum:
                     self._color_interference[w][c]+= self._w[color][c]
 
-    def quick_sort(self, vertices):
+    def _quick_sort(self, vertices):
         if not vertices:
             return []
         m = vertices[0]
@@ -88,7 +74,7 @@ class MyGraphColoring(SpectrumGraphColoring):
                 g.append(v)
             else:
                 le.append(v)
-        return self.quick_sort(g) + [m] + self.quick_sort(le)
+        return self._quick_sort(g) + [m] + self._quick_sort(le)
 
     def first_no_neighbours(self, vertex, vertices):
         neighbours = self._graph.neighbours(vertex)
@@ -106,7 +92,7 @@ class MyGraphColoring(SpectrumGraphColoring):
         n_colored = 0
         n_vertices = len(self.vertices())
         while n_colored < n_vertices:
-            vertices = self.quick_sort(vertices)
+            vertices = self._quick_sort(vertices)
             vertex = vertices[0]
             color = self._min_semi_interference(vertex, semi_coloring, spectrum)
             semi_coloring[vertex] = color
