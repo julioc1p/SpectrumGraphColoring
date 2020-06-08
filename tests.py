@@ -5,7 +5,9 @@ from dsatur import DSATURGraphColoring
 from randomc import RandomGraphColoring
 from vertex_merge import VertexMergeGraphColoring
 from bfs import BFSGraphColoring
-from swo import SWOGraphColoring
+from simple_search import SimpleSGraphColoring
+from combined_search import CombinedSGraphColoring
+from degree_bfs import DegreeBFSGraphColoring
 from random_graph_tester import RandomGraphTester
 from real_graph_tester import RealGraphTester
 import json
@@ -15,11 +17,13 @@ import json
 """
 
 algorithms = {
-    'RANDOM': RandomGraphColoring, 
+    # 'RANDOM': RandomGraphColoring, 
     'DSATUR': DSATURGraphColoring, 
     'VM': VertexMergeGraphColoring,
-    'BFS': BFSGraphColoring,
-    'SWO': SWOGraphColoring }
+    # 'BFS': BFSGraphColoring,
+    # 'Simple Search': SimpleSGraphColoring,
+    'Combined Search': CombinedSGraphColoring,
+    'DegreeBFS': DegreeBFSGraphColoring }
     # 'PSO': PSOGraphColoring}
 
 
@@ -76,7 +80,10 @@ def tsc_full_test_for_random_graph(save_file=True):
     statistics = {}
     for k in [4, 6, 11]:
         for n in [60, 70, 80]:
-            for p in [0.1, 0.5, 0.9]:
+            for p in [0.3, 0.7]:
+                print("_________________________________")
+                print("---------------------------------")
+                print(f'k={k}_n={n}_p={p}')
                 statistics[f'k={k}_n={n}_p={p}'] = tsc_test_for_random_graph(algorithms, n, p, k, 20, 10, k)
     if save_file is True:
         with open('tsc_full_test_for_random_graph.json', 'w') as handle:
@@ -244,7 +251,7 @@ if __name__ == "__main__":
     # tsc_simple_test_for_random_graph() # simple test
     # tsc_medium_test_for_random_graph() # medium test
     # tsc_complex_test_for_random_graph() # complex test
-    # tsc_full_test_for_random_graph() # full test
+    tsc_full_test_for_random_graph(False) # full test
 
     # CSC tests
     # csc_simple_test_for_random_graph() # simple test

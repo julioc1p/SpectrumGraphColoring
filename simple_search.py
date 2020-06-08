@@ -10,7 +10,7 @@ from graph2 import Graph
     and solves its TSC and CSC problems using a DSATUR-based heuristic.
 """
 
-class BFSGraphColoring(SpectrumGraphColoring):
+class SimpleSGraphColoring(SpectrumGraphColoring):
 
     def __init__(self, graph, spectrum, w, c=None):
         super().__init__(graph, spectrum, w, c)
@@ -20,26 +20,21 @@ class BFSGraphColoring(SpectrumGraphColoring):
         self._color_interference = {}
 
         
-    def _max_saturation_degree(self, vertices, semi_coloring):
+    def _max_saturation_degree(self, vertices):
         """ takes a coloring and returns the vertex with lowest
             saturation degree (it is the vertice with more already colored
             neighbours), the one which the higher degree in a tie or
             a random one in a double tie.
         """
-        best_v = []
-        for v in vertices:
-            if not semi_coloring[v]:
-                if not best_v:
-                    best_v = [v]
-                if self._saturation_degree[v] > self._saturation_degree[best_v[0]]:
-                    best_v = [v]
-                elif self._saturation_degree[v] == self._saturation_degree[best_v[0]] and \
-                        self._vertex_degree[v] > self._vertex_degree[best_v[0]]:
-                    best_v = [v]
-                elif self._saturation_degree[v] == self._saturation_degree[best_v[0]] and \
-                        self._vertex_degree[v] == self._vertex_degree[best_v[0]]:
-                    best_v.append(v)
-        return random.choice(best_v)
+        if len(vertices) == 1:
+            return vertices[0]
+        v = vertices[0]
+        index = 1
+        while index < len(vertices) and self._vertex_degree[v] == self._vertex_degree[vertices[index]]:
+            if self._saturation_degree[vertices[index]] > self._saturation_degree[v]:
+                v = vertices[index]
+            index+=1
+        return v
 
     def _min_semi_interference(self, vertex, semi_coloring, spectrum):
         """ calculates the color with the lowest potential interference in the 
@@ -53,7 +48,7 @@ class BFSGraphColoring(SpectrumGraphColoring):
                 best_c = c
         return best_c
 
-    def _update_values(self, vertex,color, semi_coloring, is_CSC=False):
+    def _update_values(self, vertex,color, semi_coloring, is_CSC=False, update_color=False):
         """ updates the internal values to compute the saturation degree and
             the color interference.
         """
@@ -62,34 +57,59 @@ class BFSGraphColoring(SpectrumGraphColoring):
             self._saturation_degree[w]+=1
             # if is_CSC is True it should update for every neighbours
             # no matter it is not None
-            if semi_coloring[w] is None or is_CSC:
+            if semi_coloring[w] is None or is_CSC is True:
                 # update the potential interference in w for every color
                 for c in self._spectrum:
                     self._color_interference[w][c]+= self._w[color][c]
+                    if update_color is True:
+                        self._color_interference[w][c] -= self._w[semi_coloring[vertex]][c]
+
+    def quick_sort(self, vertices):
+        if not vertices:
+            return []
+        m = vertices[0]
+        g = []
+        le = []
+        for v in vertices[1:]:
+            if self._vertex_degree[v] > self._vertex_degree[m] or \
+                (self._vertex_degree[v] == self._vertex_degree[m] and self._saturation_degree[v] > self._saturation_degree[m]):
+                g.append(v)
+            else:
+                le.append(v)
+        return self.quick_sort(g) + [m] + self.quick_sort(le)
+
+    def first_no_neighbours(self, vertex, vertices):
+        neighbours = self._graph.neighbours(vertex)
+        for v in vertices:
+            if not v in neighbours:
+                return v
+        return None
 
     def ThresholdSpectrumColoring(self, k):
         """ Solution for the TSC problem using TSC-DSATUR heuristic 
         """
         semi_coloring = self._new_coloring() # clean self values
         spectrum = self._spectrum[:k]
-        visit = {v:0 for v in self.vertices()}
-        all_vertices = self.vertices().copy()
-        for v in self.vertices():
-            if visit[v]:
-                continue
-            bfs_vertices = [self._max_saturation_degree(all_vertices, semi_coloring)]
-            visit[bfs_vertices[0]] = 1
-            while len(bfs_vertices):
-                vertex = bfs_vertices.pop()
-                all_vertices.remove(vertex)
-                color = self._min_semi_interference(vertex, semi_coloring, spectrum)
-                semi_coloring[vertex] = color
-                self._update_values(vertex, color, semi_coloring)
-                for neighbour in self._graph.neighbours(vertex):
-                    if visit[neighbour] is 0:
-                        visit[neighbour] = 1
-                        bfs_vertices.append(neighbour)
-            return self.threshold(semi_coloring), semi_coloring
+        vertices = self.vertices()
+        n_colored = 0
+        n_vertices = len(self.vertices())
+        while n_colored < n_vertices:
+            vertices = self.quick_sort(vertices)
+            vertex = vertices[0]
+            color = self._min_semi_interference(vertex, semi_coloring, spectrum)
+            semi_coloring[vertex] = color
+            n_colored+= 1 
+            self._update_values(vertex, color, semi_coloring, True)
+            vertices.remove(vertex)
+            fneighbour = self.first_no_neighbours(vertex, vertices)
+            if fneighbour is not None:
+                color = self._min_semi_interference(fneighbour, semi_coloring, spectrum)
+                semi_coloring[fneighbour] = color
+                n_colored+= 1 
+                self._update_values(fneighbour, color, semi_coloring, True)
+                vertices.remove(fneighbour)
+        self._simple_search(semi_coloring, spectrum)
+        return self.threshold(semi_coloring), semi_coloring
 
     def ChromaticSpectrumColoring(self, t):
         """ Solution for the CSC problem using CSC-DSATUR heuristic 
@@ -141,6 +161,43 @@ class BFSGraphColoring(SpectrumGraphColoring):
                 interference+=self._w[semi_coloring[vertex]][semi_coloring[v]]
         return interference
 
+    def _coloring2str(self, coloring):
+        s = ''
+        for item in coloring:
+            s += str(item) + ':' + str(coloring[item]) + '-'
+        return s
+
+    def _simple_search(self, coloring, spectrum):
+        max_iters = 20
+        iters = 0
+        # tabus = []
+        rep = int(len(self._graph.vertices())/3)
+        best = self.threshold(coloring)
+        while iters < max_iters:
+            # c_mark = self._coloring2str(coloring)
+            for v in random.sample(self.vertices(), rep):
+                c = self._min_semi_interference(v, coloring, spectrum)
+                v_color = coloring[v]
+                coloring[v] = c
+                # v_mark = self._coloring2str(coloring)
+                t = self.threshold(coloring)
+                # t = threshold - self._potential_interference(v, v_color, coloring) + self._potential_interference(v, c, coloring)
+                coloring[v] = v_color
+                if t < best:
+                    best = t
+                    self._update_values(v,c, coloring, True, True)
+                    coloring[v] = c
+                    # tabus.append((c_mark, v_mark))
+                    # tabus.append((v_mark, c_mark))
+                    # if len(tabus) == 14:
+                    #     tabus.pop()
+                    #     tabus.pop()
+                    break
+            # if changed:
+            #     print(iters)
+            iters+=1
+                
+
 
 
 if __name__ == "__main__":
@@ -160,15 +217,15 @@ if __name__ == "__main__":
         "blue": {"red": .25, "green": .5, "blue": 1, "violet": .5},
         "violet": {"red": .125, "green": .25, "blue": .5, "violet": 1}        
     }
-    sgraph = BFSGraphColoring(graph, S, W)
+    sgraph = SWOGraphColoring(graph, S, W)
 
     k0 = 3
     t0 = 1.0
     t = sgraph.ThresholdSpectrumColoring(k0)
-    k = sgraph.ChromaticSpectrumColoring(t0)
+    # k = sgraph.ChromaticSpectrumColoring(t0)
     print('Graph:')
     print(sgraph)
     print(f'PSO best value and coloring for the TSC problem and k = {k0}:')
     print(t)
-    print(f'PSO best value and coloring for the TSC problem and t = {t0}:')
-    print(k)
+    # print(f'PSO best value and coloring for the TSC problem and t = {t0}:')
+    # print(k)
