@@ -55,8 +55,6 @@ class MyPSO():
                 self.try_move(particle, new_particle)
                 self.particles[i] = new_particle
                 self.velocities[i] = new_velocity
-                # else:
-                #     print('PInga !!!!!!!!!!!!!!!!!!!!!')
             iters+=1
         return self.gbest_value, self.gbest_position
 
@@ -64,7 +62,6 @@ class MyPSO():
         for i in range(self.dim):
             if new_particle[i] >= self.max or new_particle[i] < self.min:
                 new_particle[i] = particle[i]
-        # return all([x >= self.min and x < self.max for x in particle])
             
 
 # search_space = Space(1, target_error, n_particles)

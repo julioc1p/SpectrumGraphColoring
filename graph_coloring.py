@@ -1,115 +1,184 @@
+""" Python Class
+    Clase en Python para dos problemas de coloracion de grafos con espectros,
+    el problema Threshold Spectrum Coloring y el problema Chromatic Spectrum
+    Coloring. Esta clase implementa algunos metodos y brinda cotas para estos
+    problemas.
+
+    "Threshold Spectrum Coloring (TSC)":
+        Dado un grafo G y un espectro de k colores dotado con
+        una matriz W de k x k de interferencias entre los colores, el objetivo
+        de TSC es determinar el minimo umbral t ∈ R ≥ 0 tal que  el grafo 
+        (G, W) admita una k-coloracion c en donde la interferencia en cada 
+        vertice es a lo sumo t, a este umbral lo denotaremos como el minimo
+        umbral k-cromatico de (G, W).
+
+    "Chromatic Spectrum Coloring (CSC)":
+        Dado un grafo G y un espectro de colores S, dotado con
+        una matriz W de |S| x |S| de interferencia entre los colores, fijado
+        un umbral t ∈ R ≥ 0 y donde el espectro tiene un numero de colores
+        hasta la cantidad de vertices |V|, el objetivo de CSC es determinar
+        el minimo numero de colores k ∈ N tal que el grafo (G, W) admita una
+        k-coloracion c en donde la interferencia en cada vertice es lo sumo
+        el umbral t fijado, a este k lo denotaremos como el minimo numero
+        cromatico de t-interferencia de (G, W).
+"""
+
 from graph2 import Graph
 from gcd import lgcd
 
 
-""" A Python Class
-    A Python graph class for two Spectrum Graph Coloring problems,
-    the Threshold Spectrum Coloring problem and the Chromatic Spectrum
-    Coloring problem. This class implements some methods and 
-    bounds for these problems.
-
-    "Threshold Spectrum Coloring (TSC) problem":
-        Given a graph G and a spectrum of k colors, endowed with
-        a k × k matrix W of interferences between them, the goal is to determine
-        the minimum threshold t ∈ R ≥0 such that (G, W ) admits a k-coloring c 
-        in which the interference at every vertex is at most t.
-
-    "Chromatic Spectrum Coloring (CSC) problem":
-        Given a graph G and a spectrum of colors S, endowed with a |S| × |S|
-        matrix W of interferences between them, a threshold t ∈ R ≥0 is fixed and 
-        the spectrum is let to have as size the number |V (G)| of vertices, the goal
-        being to determine the minimum number of colors k ∈ N such that (G, W ) admits
-        a k-coloring c in which the interference at every vertex is at most that 
-        threshold t.
-"""
-
 class SpectrumGraphColoring(object):
 
     def __init__(self, graph, spectrum, w, c=None):
-        """ initializes a GraphColoring object
-            "graph" is a Graph object, "spectrum" is a list
-            of colors and "w" is a dictionary of weights.
-        """
+        """Inicializa un objeto SpectrumGraphColoring usando
+        un grafo, un espectro de colores y una matriz de interferencias.
+
+        Args:
+            graph (Graph): Grafo en forma de lista de adyacencia.
+            spectrum (list): Espectro de colores.
+            w (dict): Matriz de interferencias entre los colores.
+            c (dict, opcional): Coloracion del grado. Por defecto es None.
+        """        
         self._graph = graph
         self._spectrum = spectrum
         self._w = w
         self._c = c
 
     def set_coloring(self, c):
-        """ set a coloring "c" to the vertices of self._graph, 
-            "c" is expected to be a dict.
-        """
+        """Colorea el grafo.
+
+        Args:
+            c (dict): Nueva coloracion del grafo.
+        """        
         self._c = c
     
     def vertices(self):
+        """Vertices del grafo.
+
+        Returns:
+            list: Lista de vertices.
+        """   
         return self._graph.vertices()
 
     def vertex_interference(self, vertex, c=None):
-        """ The interference of a vertex is the sum of the interferences in self._w
-            between the color of "vertex" and the color of its neighbours.
-        """
-        if not c:
-            c = self._c
+        """Interferencia de un vertice en una coloracion.
+        La interferencia de un vertice es la suma entre las
+        interferencias del color del 'vertex' y el de cada uno de
+        sus vecinos en la matriz W. Se usara la coloracion de la
+        clase en caso que c sea None.
+
+        Args:
+            vertex : Vertice del grafo.
+            c (dict): Coloracion del grafo. Por defecto es None.
+
+        Returns:
+            float: Interferencia del vertice 'vertex'.
+        """   
+        # calculamos la potencial interferencia para el color de 'vertex' en la coloracion
         return self._potential_interference(vertex, c[vertex], c)
 
     def _potential_interference(self, vertex, color, c=None):
-        """ potential interference of a vertex "vertex" with a color "color" is
-            the sum of the interferences in self._w of "color" and the color of
-            "vertex"'s neighbours.
-        """
+        """Potencial interferencia de un vertice en una coloracion.
+        La potencial interferencia del vertice 'vertex' con un
+        con color 'color' es la suma entre las interferencias de
+        'color' y cada uno de los colores de los adyacentes de 'vertex'.
+        Se usara la coloracion de la clase en caso que c sea None.
+
+        Args:
+            vertex : Vertice del grafo.
+            color : Color del espectro
+            c (dict): Coloracion del grafo. Por defecto es None.
+
+        Returns:
+            float Potencial interferencia de 'vertex' con el color 'color'.
+        """        
+        # usamos la coloracion de la clase en caso que 'c' sea None     
         if not c:
             c = self._c
         interference = 0
+        # sumamos las interferencias entre 'color' y cada uno
+        # de los colores de los adyacentes a 'vertex'
         for neighbour in self._graph.neighbours(vertex):
             neighbour_color = c[neighbour]
             interference += self._w[color][neighbour_color]
         return interference
         
-    def is_wstable(self):
-        """ we say that the k-coloring c is w-stable if, for every vertex,
-            the actual interference is not greater than any of the potential interferences.
-        """
+    def is_wstable(self, c=None):
+        """Coloracion w-estable. Una coloracion es w-estable
+        si para cada uno de los vertices su interferencia actual
+        no es mayor que ninguna de las potenciales interferencias
+        en la coloracion.
+
+        Args:
+            c (dict): Coloracion del grafo. Por defecto es None.
+
+        Returns:
+            bool: True si la coloracion es w-estable, False en otro caso.
+        """        
         for vertex in self._graph.vertices():
-            vertex_interference = self.vertex_interference(vertex)
+            vertex_interference = self.vertex_interference(vertex, c)
             for color in self._spectrum:
-                if self._potential_interference(vertex, color) < vertex_interference:
+                if self._potential_interference(vertex, color, c) < vertex_interference:
                     return False
         return True
 
     def threshold(self, c=None):
-        """ it determines the threshold for a coloring ("c" or self._c),
-            .i.e the maximum interference of the vertices in the graph for
-            that coloring.
-        """
+        """Determina el umbral de interferencia para una coloracion.
+        Este umbral es el maximo valor de las interferencias de los
+        vertices del grafo.
+
+        Args:
+            c (dict): Coloracion del grafo. Por defecto es None.
+
+        Returns:
+            float: Umbral de interferencia.
+        """        
         return max([self.vertex_interference(v, c) for v in self.vertices()])
 
     def tsc_upper_bound(self, k):
-        """ it determites the upper bound for the tsc problem,
-            using self._graph, self._spectrum and the matrix self._w,
-            and a "k" between 2 and |self._w|.
-        """
+        """Determina la cota superior para el problema TSC.
+
+        Args:
+            k (int): Numero de colores permitidos.
+
+        Returns:
+            float: Cota superior para el umbral de TSC.
+        """        
         nnorm = self._natural_norm()
         Delta = self._graph.Delta()
         return (Delta*nnorm)/k
     
     def csc_upper_bound(self, t):
-        """ it determites the upper bound for the csc problem,
-            using self._graph, self._spectrum, the matrix self._w
-            and a "t" such that 
-            |self._w|*t >= MaxDeg(self._graph)*NormalNorm(self._w).
-        """
+        """Determina la cota superior para el problema CSC.
+
+        Args:
+            t (float): Umbral de interferencia permitido.
+
+        Returns:
+            int: Cota superior para el numero de colores de CSC.
+        """        
         nnorm = self._natural_norm()
         Delta = self._graph.Delta()
+        # convertimos el diccionario 'self._w' en una lista con todos sus elementos
         w = [self._w[i].values() for i in self._w]
         w = [item for sublist in w for item in sublist]
+        # calculamos el maximo comun divisor de la lista (numeros no enteros)
         gcd_w = lgcd(w)
+        # caso donde 't' es divisor del mcd
+        # usar -(-a//b) calcula la division parte entera por encima
         if gcd_w % t == 0 or t == 1:
             return -( -(Delta*nnorm + gcd_w) // (t + gcd_w) )
+        # caso donde 't' no es divisor del mcd
         else :
             return -( -(Delta*nnorm + gcd_w) // (gcd_w * (t//gcd_w) + gcd_w) )
 
     def _natural_norm(self):
-        """ a static method to calculate the natural norm of self._w """
+        """Calcula la norma natural de la matriz 'self._w'.
+        Esta es la maxima de las sumas de sus filas.
+
+        Returns:
+            float: Norma natural de la matriz.
+        """        
         max_row_sum = 0
         for i in self._w:
             row_sum = sum(self._w[i].values())
@@ -136,19 +205,27 @@ class SpectrumGraphColoring(object):
         return res
 
     def ThresholdSpectrumColoring(self, k):
-        """ The TSC problem determinates the minimum threshold t, 
-            such that (G, w) admits a k-coloring in which the interference
-            at every vertex is at most t.
-        """
-        pass
+        """Metodo abstracto del problema TSC.
+
+        Args:
+            k (int): Numero de colores permitidos.
+
+        Returns:
+            float, dict: Minimo umbral k-cromatico, coloracion
+                del grafo que cumple las restricciones.
+        """        
+        return None
 
     def ChromaticSpectrumColoring(self, t):
-        """ The CSC problem fixes the parameter k
-            and the spectrum is let to have as size the |V(G)|
-            of vertices, the goal is determinate the minimum k,
-            such that (G, w) admits a k-coloring in which the interference
-            at every vertex is at most that threshold t.
-        """
+        """Metodo abstracto del problema CSC.
+
+        Args:
+            t (float): Umbral de interferencia permitido.
+
+        Returns:
+            int, dict: Numero cromatico de t-interferencia, coloracion
+                del grafo que cumple las restricciones.
+        """        
         pass
 
 

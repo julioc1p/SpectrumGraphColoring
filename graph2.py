@@ -1,46 +1,72 @@
-""" A Python Class
-A simple Python graph class, demonstrating the essential 
-facts and functionalities of graphs.
+""" Python Class
+    Una clase simple de grafos en Python, con los
+    elementos y funcionalidades esenciales.
 """
 
 class Graph(object):
 
     def __init__(self, graph_dict=None):
-        """ initializes a graph object 
-            If no dictionary or None is given, an empty dictionary will be used
-        """
+        """Inicializa un objeto Graph usando un diccionario.
+        Si no es dado un diccionario o se usa None, se usara un diccionario vacio.
+
+        Args:
+            graph_dict (dict) : diccionario donde cada llave sera 
+                un vertice y los elementos asociados una lista de adyacentes al vertice.
+                Por defecto es None.
+        """        
         if graph_dict == None:
             graph_dict = {}
         self._graph_dict = graph_dict
 
     def vertices(self):
-        """ returns the vertices of a graph """
+        """Vertices del grafo.
+
+        Returns:
+            list: Lista de vertices.
+        """        
         return list(self._graph_dict.keys())
 
     def edges(self):
-        """ returns the edges of a graph """
+        """Aristas del grafo.
+
+        Returns:
+            list: Lista de aristas.
+        """        
         return self._generate_edges()
 
     def neighbours(self, vertex):
-        """ returns the neighbours of "vertex" in
-            the graph
-        """
+        """Vecinos del vertice 'vertex'.
+        Se asume que este vertice pertenece al grafo.
+
+        Args:
+            vertex : Vertice del grafo.
+
+        Returns:
+            list: Lista de adyacentes a 'vertex'.
+        """        
         return self._graph_dict[vertex]
 
-    def add_vertex(self, vertex):
-        """ If the vertex "vertex" is not in 
-            self._graph_dict, a key "vertex" with an empty
-            list as a value is added to the dictionary. 
-            Otherwise nothing has to be done. 
-        """
+    def add_vertex(self, vertex):    
+        """Agrega un nuevo vertice con una lista vacia.
+        En caso que ya exista, no se hace nada.
+
+        Args:
+            vertex : Nuevo vertice.
+        """        
         if vertex not in self._graph_dict:
             self._graph_dict[vertex] = []
 
     def add_edge(self, edge):
-        """ assumes that edge is of type set, tuple or list; 
-            the edges are undirected and
-            between two vertices cannot be multiple edges! 
-        """
+        """Se agrega una nueva arista al grafo.
+        Se asume que la arista es de tipo set, tuple o list.
+        Las aristas son unidireccionales y dos vertices no
+        pueden tener multiples aristas. En caso de que alguno
+        de los vertices no pertenezca al grafo, se agrega con el otro
+        en su lista de adyacencia.
+
+        Args:
+            edge : Nueva arista.
+        """        
         vertex1, vertex2 = edge
         if vertex1 in self._graph_dict :
             if not vertex2 in self._graph_dict[vertex1]:
@@ -54,10 +80,11 @@ class Graph(object):
             self._graph_dict[vertex2] = [vertex1]
 
     def _generate_edges(self):
-        """ A static method generating the edges of the 
-            graph "graph". Edges are represented as sets 
-            with two vertices 
-        """
+        """Metodo que genera las aritas del grafo como tuplas.
+
+        Returns:
+            list: Lista de aristas del grafo.
+        """        
         edges = []
         for vertex in self._graph_dict:
             for neighbour in self._graph_dict[vertex]:
@@ -74,23 +101,39 @@ class Graph(object):
         return res
 
     def vertex_degree(self, vertex):
-        """ The degree of a vertex is the number of edges connecting
-            it, i.e. the number of adjacent vertices. 
-        """ 
+        """Grado de un vertice del grafo.
+
+        Args:
+            vertex : Vertice del grafo.
+
+        Returns:
+            int: Grado del vertice.
+        """        
         adj_vertices =  self._graph_dict[vertex]
         degree = len(adj_vertices) + adj_vertices.count(vertex)
         return degree
 
     def degree_sequence(self):
-        """ calculates the degree sequence """
+        """Secuencia ordenada de los grados de los vertices
+        del grafo.
+
+        Returns:
+            tuple: Grados de los vertices del grafo.
+        """        
         seq = []
+        # se agregan los grados de los vertices a 'seq'
         for vertex in self._graph_dict:
             seq.append(self.vertex_degree(vertex))
+        # se ordenan los grafos de mayor a menor
         seq.sort(reverse=True)
         return tuple(seq)
 
     def delta(self):
-        """ the minimum degree of the vertices """
+        """Minimo grado del grafo.
+
+        Returns:
+            int: Minimo grado.
+        """        
         min = 100000000
         for vertex in self._graph_dict:
             vertex_degree = self.vertex_degree(vertex)
@@ -99,7 +142,11 @@ class Graph(object):
         return min
         
     def Delta(self):
-        """ the maximum degree of the vertices """
+        """Maximo grado del grafo.
+
+        Returns:
+            int: Maximo grado.
+        """        
         max = 0
         for vertex in self._graph_dict:
             vertex_degree = self.vertex_degree(vertex)

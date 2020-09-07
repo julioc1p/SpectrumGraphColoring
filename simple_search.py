@@ -1,203 +1,66 @@
-import numpy as np
-import sys
-import random
-from graph_coloring import SpectrumGraphColoring
-from graph2 import Graph
-
-
-""" A Python class
-    A Python graph class which inherites of SpectrumGraphColoring class
-    and solves its TSC and CSC problems using a DSATUR-based heuristic.
+""" Python Class
+    Clase de Python que ofrece un ofrece una optimizacion
+    a los resultados obtenidos en TSC. Realiza un proceso
+    iterativo que analiza un subconjunto de los vertices
+    del grafo y ve si minimizar su interferencia minimiza
+    el umbral de la coloracion.
 """
 
-class SimpleSGraphColoring(SpectrumGraphColoring):
+import random
+from graph2 import Graph
+from secuencial_gc import SecuencialGraphColoring
 
-    def __init__(self, graph, spectrum, w, c=None):
-        super().__init__(graph, spectrum, w, c)
-        vertices = graph.vertices()
-        self._vertex_degree = {v:len(graph.neighbours(v)) for v in vertices}
-        self._saturation_degree = {}
-        self._color_interference = {}
 
-        
-    def _max_saturation_degree(self, vertices):
-        """ takes a coloring and returns the vertex with lowest
-            saturation degree (it is the vertice with more already colored
-            neighbours), the one which the higher degree in a tie or
-            a random one in a double tie.
-        """
-        if len(vertices) == 1:
-            return vertices[0]
-        v = vertices[0]
-        index = 1
-        while index < len(vertices) and self._vertex_degree[v] == self._vertex_degree[vertices[index]]:
-            if self._saturation_degree[vertices[index]] > self._saturation_degree[v]:
-                v = vertices[index]
-            index+=1
-        return v
+class SimpleSearch(SecuencialGraphColoring):
 
-    def _min_semi_interference(self, vertex, semi_coloring, spectrum):
-        """ calculates the color with the lowest potential interference in the 
-            coloring 'semi_coloring' for 'vertex' using self._color_interference.
-        """
-        best_c = None
-        best = 1e10
-        for c in spectrum:
-            if self._color_interference[vertex][c] < best:
-                best = self._color_interference[vertex][c]
-                best_c = c
-        return best_c
+    def simple_search(self, coloring, spectrum, max_iters=20, subset_size=0):
+        """Optimiza el umbral de interferencia k-cromatico obtenido en la
+        coloracion mediante la minimizacion de la interferencia en los
+        vertices del grafo.
 
-    def _update_values(self, vertex,color, semi_coloring, is_CSC=False, update_color=False):
-        """ updates the internal values to compute the saturation degree and
-            the color interference.
-        """
-        # add 1 to saturation degree of every v's neighbours
-        for w in self._graph.neighbours(vertex):
-            self._saturation_degree[w]+=1
-            # if is_CSC is True it should update for every neighbours
-            # no matter it is not None
-            if semi_coloring[w] is None or is_CSC is True:
-                # update the potential interference in w for every color
-                for c in self._spectrum:
-                    self._color_interference[w][c]+= self._w[color][c]
-                    if update_color is True:
-                        self._color_interference[w][c] -= self._w[semi_coloring[vertex]][c]
+        Args:
+            coloring (dict): Coloracion de los vertices del grafo.
+            spectrum (list): Espectro de colores.
+            max_iters (int): Numero de iteraciones que realizara el
+                algoritmo. Por defecto es 20.
+            subset_size (int): Dimension de los subconjuntos tomados
+                en cada iteracion. Por defecto es un tercio de los
+                vertices del grafo.
 
-    def quick_sort(self, vertices):
-        if not vertices:
-            return []
-        m = vertices[0]
-        g = []
-        le = []
-        for v in vertices[1:]:
-            if self._vertex_degree[v] > self._vertex_degree[m] or \
-                (self._vertex_degree[v] == self._vertex_degree[m] and self._saturation_degree[v] > self._saturation_degree[m]):
-                g.append(v)
-            else:
-                le.append(v)
-        return self.quick_sort(g) + [m] + self.quick_sort(le)
-
-    def first_no_neighbours(self, vertex, vertices):
-        neighbours = self._graph.neighbours(vertex)
-        for v in vertices:
-            if not v in neighbours:
-                return v
-        return None
-
-    def ThresholdSpectrumColoring(self, k):
-        """ Solution for the TSC problem using TSC-DSATUR heuristic 
-        """
-        semi_coloring = self._new_coloring() # clean self values
-        spectrum = self._spectrum[:k]
-        vertices = self.vertices()
-        n_colored = 0
-        n_vertices = len(self.vertices())
-        while n_colored < n_vertices:
-            vertices = self.quick_sort(vertices)
-            vertex = vertices[0]
-            color = self._min_semi_interference(vertex, semi_coloring, spectrum)
-            semi_coloring[vertex] = color
-            n_colored+= 1 
-            self._update_values(vertex, color, semi_coloring, True)
-            vertices.remove(vertex)
-            fneighbour = self.first_no_neighbours(vertex, vertices)
-            if fneighbour is not None:
-                color = self._min_semi_interference(fneighbour, semi_coloring, spectrum)
-                semi_coloring[fneighbour] = color
-                n_colored+= 1 
-                self._update_values(fneighbour, color, semi_coloring, True)
-                vertices.remove(fneighbour)
-        self._simple_search(semi_coloring, spectrum)
-        return self.threshold(semi_coloring), semi_coloring
-
-    def ChromaticSpectrumColoring(self, t):
-        """ Solution for the CSC problem using CSC-DSATUR heuristic 
-        """
-        semi_coloring = self._new_coloring()
-        n_colored = 0
-        n_vertices = len(self.vertices())
-        while n_colored < n_vertices:
-            v = self._max_saturation_degree(semi_coloring)
-            I = 1e10
-            # try to put every color to v
-            for c in self._spectrum:
-                I = self._color_interference[v][c]
-                # case v does not have neighbours
-                if len(self._graph.neighbours(v)) == 0:
-                    n_colored+=1
-                    self._update_values(v, c, semi_coloring, is_CSC=True)
-                    break
-                # the proportion of the interference of v is right for the color c
-                if I > self._saturation_degree[v]/len(self._graph.neighbours(v))*t:
-                    continue
-                semi_coloring[v] = c
-                # the proportion of the interference of every v's neighbour is right for the color c
-                if all([1 if not semi_coloring[w] else self._semi_interference(w, semi_coloring) <= \
-                    (self._saturation_degree[w]+1)/len(self._graph.neighbours(w))*t for w in self._graph.neighbours(v)]):
-                    n_colored+=1
-                    self._update_values(v, c, semi_coloring, is_CSC=True)
-                    break
-                semi_coloring[v] = None
-            if not semi_coloring[v]:
-                return n_vertices, {v:None for v in self.vertices()}
-        return len(set(semi_coloring.values())), semi_coloring
-
-    def _new_coloring(self):
-        """ cleans the self.saturation_degree and self._color_interference values
-            and returns a new empty coloring
-        """
-        self._saturation_degree = {v:0 for v in self.vertices()}
-        self._color_interference = {v:{c:0 for c in self._spectrum} for v in self.vertices()}
-        return {v:None for v in self.vertices()}
-
-    def _semi_interference(self, vertex, semi_coloring):
-        """ calculates the color with the lowest potential interference in the 
-            coloring 'semi_coloring' for 'vertex' without using self._color_interference.
-        """
-        interference = 0
-        for v in self._graph.neighbours(vertex):
-            if semi_coloring[v]:
-                interference+=self._w[semi_coloring[vertex]][semi_coloring[v]]
-        return interference
-
-    def _coloring2str(self, coloring):
-        s = ''
-        for item in coloring:
-            s += str(item) + ':' + str(coloring[item]) + '-'
-        return s
-
-    def _simple_search(self, coloring, spectrum):
-        max_iters = 20
+        Returns:
+            float, dict: Minimo umbral k-cromatico, coloracion
+                del grafo que cumple las restricciones optimizados.
+        """        
+        # usamos 1/3 de los vertices del grafo en caso que no 
+        # se proporcione dimension
+        if subset_size is 0:
+            subset_size = int(len(self.vertices())/3)
         iters = 0
-        # tabus = []
-        rep = int(len(self._graph.vertices())/3)
+        # mejor valor del umbral
         best = self.threshold(coloring)
         while iters < max_iters:
-            # c_mark = self._coloring2str(coloring)
-            for v in random.sample(self.vertices(), rep):
+            # creamos un subconjunto de dimension subset_size
+            for v in random.sample(self.vertices(), subset_size):
+                # tomamos el color con la menor potencial interferencia para el vertice
                 c = self._min_semi_interference(v, coloring, spectrum)
                 v_color = coloring[v]
+                # si el color tomado es el mismo que tiene el vertice, continuamos
+                if c == v_color:
+                    continue
+                # asignamos el color al vertice                
                 coloring[v] = c
-                # v_mark = self._coloring2str(coloring)
+                # calculamos el umbral de la nueva coloracion
                 t = self.threshold(coloring)
-                # t = threshold - self._potential_interference(v, v_color, coloring) + self._potential_interference(v, c, coloring)
                 coloring[v] = v_color
+                # si obtenemos un menor umbral con la nueva coloracion,
+                # actualizamos los valores de las memorias y del mejor umbral
                 if t < best:
                     best = t
                     self._update_values(v,c, coloring, True, True)
                     coloring[v] = c
-                    # tabus.append((c_mark, v_mark))
-                    # tabus.append((v_mark, c_mark))
-                    # if len(tabus) == 14:
-                    #     tabus.pop()
-                    #     tabus.pop()
                     break
-            # if changed:
-            #     print(iters)
             iters+=1
-                
-
+        return self.threshold(coloring), coloring
 
 
 if __name__ == "__main__":
