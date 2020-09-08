@@ -1,0 +1,63 @@
+#########################################################################################
+#                          Formato DIMACS para grafos                                   #
+#########################################################################################
+
+http://dimacs.rutgers.edu/Challenges/
+
+SE ASUME QUE LOS GRAFOS REPRESENTADOS SON UNIDIRECCIONALES.
+SE ASUME QUE LOS NODOS ESTAN NUMERADOS DESDE 1 HASTA n.
+SE ASUME QUE TODOS LOS ARCHIVOS ESTAN BIEN FORMADOS Y SON CONSISTENTES INTERNAMENTE: 
+LOS IDENTIFICADORES DE LOS NODOS SON VALORES VALIDOS, LOS NODOS ESTAN DEFINIDOS 
+SOLO UNA VEZ Y HAY EXACTAMENTE m ARISTAS.
+
+COMENTARIOS. Las lineas de comentario dan informacion util a las personas
+acerca del grafo representado en el archivo y son completamente ignoradas
+por los programas. Cada linea de comentario comienza con el caracter en
+miniscula c.
+c Este es un ejemplo de comentario
+
+PROBLEMA. Hay solo una linea de problema por cada archivo. Esta linea
+tiene que aparecer antes de cualquier nodo o descripcion de arista.
+La linea del problema tiene el siguiente formato:
+p FORMAT NODES EDGES
+El caracter p significa que es una linea de problema.
+El campo FORMAT es consistente con formatos  desafios previos y debe
+contener la palabra "edge".
+El campo NODES contiene un valor entero que especifica el n, o sea,
+el numero de nodos del grafo.
+El campo EDGES contiene un valor entero que especifica el m, o sea,
+el numero de aristas del grafo.
+
+ARISTAS. Se define una linea por cada arista del grafo. Cada arista
+(u, v) debe aparecer solo una vez en el archivo, y no repetida
+como (v, u). Las lineas de aristas tienen el siguiente formato:
+e u v
+El caracter e proviene de la palabra en ingles edge, que significa
+arista, y representa que esta linea define una arista.
+Los campos (u, v) especifican los nodos unidos por esta arista
+
+Ejemplo:
+----Archivo---------------------------------
+c Este es el grafo completo de 3 vertices
+p edge 3 3
+e 1 2
+e 1 3
+e 2 3
+--------------------------------------------
+
+
+NOTA:
+Para la comodidad del usuario, se permite omitir los caracteres iniciales de cada linea y el
+uso del caracter estandar % para los comentarios, asumiendo que se mantendra el resto del 
+formato y la primera linea definira el grafo. La palabra 'edge' puede ser remplazada.
+
+Ejemplo:
+----Archivo---------------------------------
+% Este es el grafo completo de 3 vertices
+k3 3 3
+1 2
+1 3
+2 3
+--------------------------------------------
+
+#########################################################################################
