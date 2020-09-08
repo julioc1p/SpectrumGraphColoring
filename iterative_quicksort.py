@@ -20,7 +20,10 @@ def partition(arr, l, h):
 # l  --> Starting index, 
 # h  --> Ending index 
 def quickSortIterative(arr, l, h): 
-  
+    
+    if len(arr) <= 1 :
+        return arr
+
     # Create an auxiliary stack 
     size = h - l + 1
     stack = [0] * (size) 
@@ -62,3 +65,4 @@ def quickSortIterative(arr, l, h):
             stack[top] = p + 1
             top = top + 1
             stack[top] = h 
+            
