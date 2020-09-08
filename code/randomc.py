@@ -1,5 +1,5 @@
-from graph_coloring import SpectrumGraphColoring
-from graph2 import Graph
+from code.graph_coloring import SpectrumGraphColoring
+from code.graph2 import Graph
 from random import choice
 
 

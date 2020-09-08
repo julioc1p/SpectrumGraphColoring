@@ -1,13 +1,13 @@
-from graph2 import Graph
-from secuencial_gc import SecuencialGraphColoring
+from code.graph2 import Graph
+from code.secuencial_gc import SecuencialGraphColoring
 # soluciones base
-from dsatur import DSATURGraphColoring
-from bfs import BFSGraphColoring
-from degree_bfs import DegreeBFSGraphColoring
-from vertex_merge import VertexMergeGraphColoring
-from swo import SWOGraphColoring
+from code.dsatur import DSATURGraphColoring
+from code.bfs import BFSGraphColoring
+from code.degree_bfs import DegreeBFSGraphColoring
+from code.vertex_merge import VertexMergeGraphColoring
+from code.swo import SWOGraphColoring
 # algoritmos de optimizacion
-from simple_search import SimpleSearch
+from code.simple_search import SimpleSearch
 
 
 class DSATURPlusSS(DSATURGraphColoring, SimpleSearch):

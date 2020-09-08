@@ -4,7 +4,7 @@
 
 import random
 import numpy as np
-from graph2 import Graph
+from code.graph2 import Graph
 from stopwatch import Stopwatch
 
 

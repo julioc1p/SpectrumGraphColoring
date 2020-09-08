@@ -23,8 +23,8 @@
         cromatico de t-interferencia de (G, W).
 """
 
-from graph2 import Graph
-from gcd import lgcd
+from code.graph2 import Graph
+from code.gcd import lgcd
 
 
 class SpectrumGraphColoring(object):

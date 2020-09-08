@@ -1,7 +1,7 @@
 """ Metodo para leer grafos en formato DIMACS
 """
 
-from graph2 import Graph
+from code.graph2 import Graph
 
 
 def dimacs_reader(path):

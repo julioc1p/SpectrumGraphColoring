@@ -9,7 +9,7 @@
     brinda una solucion a CSC si se le proporciona una de TSC.
 """
 
-from graph_coloring import SpectrumGraphColoring
+from code.graph_coloring import SpectrumGraphColoring
 
 
 class CSCBinarySearch(SpectrumGraphColoring):

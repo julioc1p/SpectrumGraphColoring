@@ -6,9 +6,9 @@
     para resolver CSC mediante su implementacion de TSC.
 """
 
-from graph2 import Graph
-from secuencial_gc import SecuencialGraphColoring
-from csc_binarysearch import CSCBinarySearch
+from code.graph2 import Graph
+from code.secuencial_gc import SecuencialGraphColoring
+from code.csc_binarysearch import CSCBinarySearch
 
 
 class BFSGraphColoring(SecuencialGraphColoring, CSCBinarySearch):

@@ -13,11 +13,11 @@
 """
 
 import random
-from graph2 import Graph
-from secuencial_gc import SecuencialGraphColoring
-from csc_binarysearch import CSCBinarySearch
+from code.graph2 import Graph
+from code.secuencial_gc import SecuencialGraphColoring
+from code.csc_binarysearch import CSCBinarySearch
 # implementacion Quick Sort iterativa
-from iterative_quicksort import quickSortIterative
+from code.iterative_quicksort import quickSortIterative
 
 
 class SWOGraphColoring(SecuencialGraphColoring, CSCBinarySearch):

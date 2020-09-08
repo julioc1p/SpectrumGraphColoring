@@ -9,7 +9,7 @@
 """
 
 import random
-from graph_coloring import SpectrumGraphColoring
+from code.graph_coloring import SpectrumGraphColoring
 
 
 class SecuencialGraphColoring(SpectrumGraphColoring):

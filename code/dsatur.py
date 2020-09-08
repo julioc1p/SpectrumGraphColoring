@@ -8,8 +8,8 @@
 """
 
 import random
-from graph2 import Graph
-from secuencial_gc import SecuencialGraphColoring
+from code.graph2 import Graph
+from code.secuencial_gc import SecuencialGraphColoring
 
 
 class DSATURGraphColoring(SecuencialGraphColoring):

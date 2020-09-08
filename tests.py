@@ -3,20 +3,20 @@
 """
 
 import json
-from graph_coloring import SpectrumGraphColoring
-from graph2 import Graph
-from dsatur import DSATURGraphColoring
-from randomc import RandomGraphColoring
-from vertex_merge import VertexMergeGraphColoring
-from bfs import BFSGraphColoring
-from simple_search import SimpleSearch
-from degree_bfs import DegreeBFSGraphColoring
-from swo import SWOGraphColoring
-from improved_methods import DSATURPlusSS, VMPlusSS, \
+from code.graph_coloring import SpectrumGraphColoring
+from code.graph2 import Graph
+from code.dsatur import DSATURGraphColoring
+from code.randomc import RandomGraphColoring
+from code.vertex_merge import VertexMergeGraphColoring
+from code.bfs import BFSGraphColoring
+from code.simple_search import SimpleSearch
+from code.degree_bfs import DegreeBFSGraphColoring
+from code.swo import SWOGraphColoring
+from code.improved_methods import DSATURPlusSS, VMPlusSS, \
     BFSPlusSS, DBFSPlusSS, SWOPlusSS
-from tester import GraphTester
-from weight_funtions import inv_pow2, empiric_dist
-from dimacs import dimacs_reader
+from code.tester import GraphTester
+from code.weight_funtions import inv_pow2, empiric_dist
+from code.dimacs import dimacs_reader
 
 
 # Algoritmos usados en los experimentos
