@@ -37,12 +37,12 @@ if __name__ == "__main__":
         "d": ["c"]
     }
     graph = Graph(g)
-    S = ["red", "green", "blue", "violet"]
+    S = ["1", "2", "3", "4"]
     W = {
-        "red": {"red": 1, "green": .5, "blue": .25, "violet":.125},
-        "green": {"red": .5, "green": 1, "blue": .5, "violet": .25},
-        "blue": {"red": .25, "green": .5, "blue": 1, "violet": .5},
-        "violet": {"red": .125, "green": .25, "blue": .5, "violet": 1}        
+        "1": {"1": 1, "2": .5, "3": .25, "4":.125},
+        "2": {"1": .5, "2": 1, "3": .5, "4": .25},
+        "3": {"1": .25, "2": .5, "3": 1, "4": .5},
+        "4": {"1": .125, "2": .25, "3": .5, "4": 1}        
     }
     sgraph = RandomGraphColoring(graph, S, W)
 
