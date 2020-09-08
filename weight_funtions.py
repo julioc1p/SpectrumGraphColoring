@@ -15,7 +15,7 @@ def inv_pow2(x, y):
     """    
     return 1/2**abs(x-y)
 
-def mydist(x, y):
+def empiric_dist(x, y):
     """ Funcion de valores empiricos para la interferencia
     entre dos colores del espectro.
 

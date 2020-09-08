@@ -15,13 +15,13 @@ from swo import SWOGraphColoring
 from improved_methods import DSATURPlusSS, VMPlusSS, \
     BFSPlusSS, DBFSPlusSS, SWOPlusSS
 from tester import GraphTester
-from weight_funtions import inv_pow2, mydist
+from weight_funtions import inv_pow2, empiric_dist
 from dimacs import dimacs_reader
 
 
 # Algoritmos usados en los experimentos
 algorithms = {
-    # 'RANDOM': RandomGraphColoring,
+    'RANDOM': RandomGraphColoring,
     'DSATUR': DSATURGraphColoring,
     'BFS': BFSGraphColoring,
     'DegreeBFS': DegreeBFSGraphColoring,
@@ -40,17 +40,17 @@ algorithms = {
 ##############################################
 
 # Test de TSC general para grafos aleatorios
-def tsc_test_for_random_graph(algorithms, n_vertices, p, s_size, n_graph, graph_iters, k):
+def tsc_test_for_random_graph(algorithms, n_vertices, p, s_size, n_graph, graph_iters, k, w_function=inv_pow2):
     rtest = GraphTester()
     rtest.make_spectrum(s_size)
-    rtest.make_w(inv_pow2)
+    rtest.make_w(w_function)
     return rtest.run_random_test(n_graph, n_vertices, p , k, algorithms, graph_iters)
 
 # Test de CSC general para grafos aleatorios
-def csc_test_for_random_graph(algorithms, n_vertices, p, s_size, n_graph, graph_iters, t):
+def csc_test_for_random_graph(algorithms, n_vertices, p, n_graph, graph_iters, t, w_function=inv_pow2):
     rtest = GraphTester()
-    rtest.make_spectrum(s_size)
-    rtest.make_w(inv_pow2)
+    rtest.make_spectrum(n_vertices)
+    rtest.make_w(w_function)
     return rtest.run_random_test(n_graph , n_vertices, p, t, algorithms, graph_iters, TSC_OR_CSC='CSC')
 
 def tsc_simple_test_for_random_graph(save_file=False):
@@ -102,7 +102,7 @@ def csc_simple_test_for_random_graph(save_file=False):
     print("---------------------------------")
     print('CSC simple test for random graphs')
     global algorithms
-    statistics = csc_test_for_random_graph(algorithms, 60, 0.5, 60, 5, 3, 15)
+    statistics = csc_test_for_random_graph(algorithms, 60, 0.5, 5, 3, 15)
     if save_file is True:
         with open('csc_simple_test_for_random_graph.json', 'w') as handle:
             handle.write(json.dumps(statistics))
@@ -112,7 +112,7 @@ def csc_medium_test_for_random_graph(save_file=False):
     print("---------------------------------")
     print('CSC medium test for random graphs')
     global algorithms    
-    statistics = csc_test_for_random_graph(algorithms, 60, 0.5, 60, 10, 5, 20)
+    statistics = csc_test_for_random_graph(algorithms, 60, 0.5, 10, 5, 20)
     if save_file is True:
         with open('csc_medium_test_for_random_graph.json', 'w') as handle:
             handle.write(json.dumps(statistics))
@@ -122,7 +122,7 @@ def csc_complex_test_for_random_graph(save_file=False):
     print("---------------------------------")
     print('CSC complex test for random graphs')
     global algorithms    
-    statistics = csc_test_for_random_graph(algorithms, 80, 0.9, 80, 20, 10, 18)
+    statistics = csc_test_for_random_graph(algorithms, 80, 0.9, 20, 10, 18)
     if save_file is True:
         with open('csc_complex_test_for_random_graph.json', 'w') as handle:
             handle.write(json.dumps(statistics))
@@ -137,9 +137,9 @@ def csc_full_test_for_random_graph(save_file=True):
                 print("---------------------------------")
                 print(f't={t}_n={n}_p={p}')
                 if t == 'np/5':
-                    statistics[f't={t}_n={n}_p={p}'] = csc_test_for_random_graph(algorithms, n, p, n, 15, 10, n*p/5)
+                    statistics[f't={t}_n={n}_p={p}'] = csc_test_for_random_graph(algorithms, n, p, 15, 10, n*p/5)
                 elif t == 'np/2':
-                    statistics[f't={t}_n={n}_p={p}'] = csc_test_for_random_graph(algorithms, n, p, n, 15, 10, n*p/2)
+                    statistics[f't={t}_n={n}_p={p}'] = csc_test_for_random_graph(algorithms, n, p, 15, 10, n*p/2)
     if save_file is True:
         with open('csc_full_test_for_random_graph.json', 'w') as handle:
                 handle.write(json.dumps(statistics))
@@ -149,18 +149,18 @@ def csc_full_test_for_random_graph(save_file=True):
 ##############################################
 
 # Test de TSC general para grafos
-def tsc_test(algorithms, graph, s_size, iters, k):
+def tsc_test(algorithms, graph, s_size, iters, k, w_function=empiric_dist):
     rtest = GraphTester()
     rtest.make_spectrum(s_size)
-    rtest.make_w(mydist)
+    rtest.make_w(w_function)
     return rtest.run_test2(graph, k, algorithms, iters)
 
 # Test de CSC general para grafos
-def csc_test(algorithms, graph, s_size, iters, t, pow2=False):
+def csc_test(algorithms, graph, iters, t, w_function=empiric_dist):
     rtest = GraphTester()
-    rtest.make_spectrum(s_size)
-    rtest.make_w(mydist)
-    return rtest.run_test2(graph , t, algorithms, iters, TSC_OR_CSC='CSC')
+    rtest.make_spectrum(len(graph.vertices()))
+    rtest.make_w(w_function)
+    return rtest.run_test2(graph, t, algorithms, iters, TSC_OR_CSC='CSC')
 
 simple_graph = {
         "a": ["b", "c"],
@@ -183,7 +183,7 @@ def simple_csc_test():
     print("---------------------------------")
     print('Simple CSC test')
     global algorithms    
-    csc_test(algorithms, simple_graph, 4, 10, 1, pow2=True)
+    csc_test(algorithms, simple_graph, 10, 1, inv_pow2)
 
 # Caso real de baja densidad de una red
 LD = {
@@ -310,7 +310,7 @@ if __name__ == "__main__":
     ## Tests for DIMACS graphs
     ##############################################
 
-    # test_for_dimacs_graph('DIMACS/hamming6-2.mtx')
+    test_for_dimacs_graph('DIMACS/hamming6-2.mtx')
 
 
     ### Codigo para hacer un sonido 'Beep' al final de la ejecucion

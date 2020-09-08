@@ -324,34 +324,3 @@ class GraphTester(object):
             else:
                 ge.append(v)
         return self._sort(l) + [m] + self._sort(ge)
-
-
-
-
-
-if __name__ == "__main__":
-
-    from dsatur import DSATURGraphColoring
-    from randomc import RandomGraphColoring
-    algorithms = {'RANDOM': RandomGraphColoring, 'DSATUR': DSATURGraphColoring}
-    g = {
-        "a": ["b", "c"],
-        "b": ["a", "c"],
-        "c": ["a", "b", "d"],
-        "d": ["c"]
-    }
-    graph = Graph(g)
-    S = ["red", "green", "blue", "violet"]
-    W = {
-        "red": {"red": 1, "green": .5, "blue": .25, "violet":.125},
-        "green": {"red": .5, "green": 1, "blue": .5, "violet": .25},
-        "blue": {"red": .25, "green": .5, "blue": 1, "violet": .5},
-        "violet": {"red": .125, "green": .25, "blue": .5, "violet": 1}        
-    }
-    # wfuntion = lambda x, y: 1/2**abs(x-y)
-    tester = GraphTester()
-    tester.spectrum = S
-    # tester.make_w(wfuntion)
-    tester.w = W
-    tester.run_test2(graph, 4, algorithms, 10)
-    # tester.run_random_test(10, 60, 0.5, 4, algorithms, 5)
