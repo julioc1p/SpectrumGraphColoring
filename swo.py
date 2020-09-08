@@ -15,11 +15,12 @@
 import random
 from graph2 import Graph
 from secuencial_gc import SecuencialGraphColoring
+from csc_binarysearch import CSCBinarySearch
 # implementacion Quick Sort iterativa
 from iterative_quicksort import quickSortIterative
 
 
-class SWOGraphColoring(SecuencialGraphColoring):
+class SWOGraphColoring(SecuencialGraphColoring, CSCBinarySearch):
 
     def ThresholdSpectrumColoring(self, k):
         """Determina el minimo umbral k-cromatico de TSC
