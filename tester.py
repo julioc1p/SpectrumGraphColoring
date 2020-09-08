@@ -179,7 +179,7 @@ class GraphTester(object):
                                 's_size': len(self._spectrum),
                                 'parameter': parameter,
                                 'n_graph': n_graph,
-                                'v_vertices': n_vertices,
+                                'n_vertices': n_vertices,
                                 'conn_prob': p,
                                 'iters': iters,
                                 'algorithms': list(algorithm_class_dict.keys())
