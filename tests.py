@@ -15,7 +15,7 @@ from code.swo import SWOGraphColoring
 from code.improved_methods import DSATURPlusSS, VMPlusSS, \
     BFSPlusSS, DBFSPlusSS, SWOPlusSS
 from code.tester import GraphTester
-from code.weight_funtions import inv_pow2, empiric_dist
+from code.weight_functions import inv_pow2, empiric_dist
 from code.dimacs import dimacs_reader
 
 

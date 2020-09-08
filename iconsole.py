@@ -7,17 +7,17 @@ import platform
 clear = lambda: os.system('clear')
 if platform.system() == 'Windows':
     clear = lambda: os.system('cls')
-from weight_funtions import inv_pow2, empiric_dist
-from dsatur import DSATURGraphColoring
-from randomc import RandomGraphColoring
-from vertex_merge import VertexMergeGraphColoring
-from bfs import BFSGraphColoring
-from simple_search import SimpleSearch
-from degree_bfs import DegreeBFSGraphColoring
-from swo import SWOGraphColoring
-from improved_methods import DSATURPlusSS, VMPlusSS, \
+from code.weight_functions import inv_pow2, empiric_dist
+from code.dsatur import DSATURGraphColoring
+from code.randomc import RandomGraphColoring
+from code.vertex_merge import VertexMergeGraphColoring
+from code.bfs import BFSGraphColoring
+from code.simple_search import SimpleSearch
+from code.degree_bfs import DegreeBFSGraphColoring
+from code.swo import SWOGraphColoring
+from code.improved_methods import DSATURPlusSS, VMPlusSS, \
     BFSPlusSS, DBFSPlusSS, SWOPlusSS
-from dimacs import dimacs_reader
+from code.dimacs import dimacs_reader
 from tests import tsc_test, csc_test, tsc_test_for_random_graph, csc_test_for_random_graph
 
 
