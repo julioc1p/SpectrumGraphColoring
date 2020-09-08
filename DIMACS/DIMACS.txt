@@ -34,7 +34,7 @@ como (v, u). Las lineas de aristas tienen el siguiente formato:
 e u v
 El caracter e proviene de la palabra en ingles edge, que significa
 arista, y representa que esta linea define una arista.
-Los campos (u, v) especifican los nodos unidos por esta arista
+Los campos (u, v) especifican los nodos unidos por esta arista.
 
 Ejemplo:
 ----Archivo---------------------------------
@@ -54,6 +54,7 @@ formato y la primera linea definira el grafo. La palabra 'edge' puede ser rempla
 Ejemplo:
 ----Archivo---------------------------------
 % Este es el grafo completo de 3 vertices
+% Notar el remplazo de "edge" por k3
 k3 3 3
 1 2
 1 3
