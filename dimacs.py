@@ -16,20 +16,20 @@ def dimacs_reader(path):
     fil = open(path)
     graph_dict = {}
     for line in fil:
-        if line[0] == 'c' or line[0] == '%':
+        if line == '\n':
+            continue
+        line = line.split()
+        if line[0] == 'c' or (len(line[0])> 1 and line[0][0] == '%'):
             continue
         if line[0] == 'p':
-            s = line.split()
-            graph_dict = {str(i):[] for i in range(1, int(s[2]) + 1)}
+            graph_dict = {str(i):[] for i in range(1, int(line[2]) + 1)}
         elif line[0] == 'e':
-            s = line.split()
-            graph_dict[s[1]].append(s[2])
-            graph_dict[s[2]].append(s[1])
+            graph_dict[line[1]].append(line[2])
+            graph_dict[line[2]].append(line[1])
         else:
-            s = line.split()
             if not graph_dict :
-                graph_dict = {str(i):[] for i in range(1, int(s[0]) + 1)}
+                graph_dict = {str(i):[] for i in range(1, int(line[1]) + 1)}
             else:
-                graph_dict[s[0]].append(s[1])
-                graph_dict[s[1]].append(s[0])
+                graph_dict[line[0]].append(line[1])
+                graph_dict[line[1]].append(line[0])
     return Graph(graph_dict)
