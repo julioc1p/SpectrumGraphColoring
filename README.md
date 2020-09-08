@@ -1,8 +1,8 @@
 # Spectrum Graph Coloring
 
-``PySGColoring`` es un libreria en Python que brinda herramientas para resolver los problemas de coloracion grafos con espectros TSC y CSC.
+``PySGColoring`` es un libreria en Python que brinda herramientas para resolver los problemas de coloracion de grafos con espectros TSC y CSC.
 
-``iconsole`` es una util y sencilla consola interactiva que permite experimentar con los problemas de coloracion grafos con espectros TSC y CSC.
+``iconsole`` es una util y sencilla consola interactiva que permite experimentar con los problemas de coloracion de grafos con espectros TSC y CSC.
 
 ## Instalacion
 

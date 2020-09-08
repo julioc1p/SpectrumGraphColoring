@@ -1,4 +1,4 @@
-""" Consola interactiva util y sencilla consola que permite experimentar con los problemas de coloracion grafos con espectros TSC y CSC.
+""" Consola interactiva util y sencilla consola que permite experimentar con los problemas de coloracion de grafos con espectros TSC y CSC.
 """
 
 import os
@@ -23,7 +23,7 @@ from tests import tsc_test, csc_test, tsc_test_for_random_graph, csc_test_for_ra
 
 while True:
     clear()
-    print('Bienvenidos a la consola interactiva para realizar experimentos\nen los problemas de coloracion grafos con espectros TSC y CSC.\n')
+    print('Bienvenidos a la consola interactiva para realizar experimentos\nen los problemas de coloracion de grafos con espectros TSC y CSC.\n')
     print('Introduzca el numero correspondiente para realizar experimentos en:\n \n(1) TSC \n(2) CSC\n')
 
     text = input()
