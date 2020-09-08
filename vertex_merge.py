@@ -105,10 +105,10 @@ if __name__ == "__main__":
     k0 = 3
     t0 = 1.0
     t = sgraph.ThresholdSpectrumColoring(k0)
-    # k = sgraph.ChromaticSpectrumColoring(t0)
+    k = sgraph.ChromaticSpectrumColoring(t0)
     print('Graph:')
     print(sgraph)
-    print(f'PSO best value and coloring for the TSC problem and k = {k0}:')
+    print(f'VM best value and coloring for the TSC problem and k = {k0}:')
     print(t)
-    # print(f'PSO best value and coloring for the TSC problem and t = {t0}:')
-    # print(k)
+    print(f'VM best value and coloring for the CSC problem and t = {t0}:')
+    print(k)

@@ -82,7 +82,7 @@ if __name__ == "__main__":
         "blue": {"red": .25, "green": .5, "blue": 1, "violet": .5},
         "violet": {"red": .125, "green": .25, "blue": .5, "violet": 1}        
     }
-    sgraph = BFSGraphColoring(graph, S, W)
+    sgraph = DegreeBFSGraphColoring(graph, S, W)
 
     k0 = 3
     t0 = 1.0
@@ -90,7 +90,7 @@ if __name__ == "__main__":
     k = sgraph.ChromaticSpectrumColoring(t0)
     print('Graph:')
     print(sgraph)
-    print(f'PSO best value and coloring for the TSC problem and k = {k0}:')
+    print(f'DegreeBFS best value and coloring for the TSC problem and k = {k0}:')
     print(t)
-    print(f'PSO best value and coloring for the TSC problem and t = {t0}:')
+    print(f'DegreeBFS best value and coloring for the CSC problem and t = {t0}:')
     print(k)

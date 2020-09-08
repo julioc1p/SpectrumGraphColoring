@@ -61,34 +61,4 @@ class SimpleSearch(SecuencialGraphColoring):
                     break
             iters+=1
         return self.threshold(coloring), coloring
-
-
-if __name__ == "__main__":
-    
-
-    g = {
-        "a": ["b", "c"],
-        "b": ["a", "c"],
-        "c": ["a", "b", "d"],
-        "d": ["c"]
-    }
-    graph = Graph(g)
-    S = ["red", "green", "blue", "violet"]
-    W = {
-        "red": {"red": 1, "green": .5, "blue": .25, "violet":.125},
-        "green": {"red": .5, "green": 1, "blue": .5, "violet": .25},
-        "blue": {"red": .25, "green": .5, "blue": 1, "violet": .5},
-        "violet": {"red": .125, "green": .25, "blue": .5, "violet": 1}        
-    }
-    sgraph = SWOGraphColoring(graph, S, W)
-
-    k0 = 3
-    t0 = 1.0
-    t = sgraph.ThresholdSpectrumColoring(k0)
-    # k = sgraph.ChromaticSpectrumColoring(t0)
-    print('Graph:')
-    print(sgraph)
-    print(f'PSO best value and coloring for the TSC problem and k = {k0}:')
-    print(t)
-    # print(f'PSO best value and coloring for the TSC problem and t = {t0}:')
-    # print(k)
+        

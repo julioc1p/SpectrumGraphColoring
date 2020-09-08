@@ -114,15 +114,15 @@ if __name__ == "__main__":
         "blue": {"red": .25, "green": .5, "blue": 1, "violet": .5},
         "violet": {"red": .125, "green": .25, "blue": .5, "violet": 1}        
     }
-    sgraph = CombinedSGraphColoring(graph, S, W)
+    sgraph = SWOGraphColoring(graph, S, W)
 
     k0 = 3
     t0 = 1.0
     t = sgraph.ThresholdSpectrumColoring(k0)
-    # k = sgraph.ChromaticSpectrumColoring(t0)
+    k = sgraph.ChromaticSpectrumColoring(t0)
     print('Graph:')
     print(sgraph)
-    print(f'PSO best value and coloring for the TSC problem and k = {k0}:')
+    print(f'SWO best value and coloring for the TSC problem and k = {k0}:')
     print(t)
-    # print(f'PSO best value and coloring for the TSC problem and t = {t0}:')
-    # print(k)
+    print(f'SWO best value and coloring for the CSC problem and t = {t0}:')
+    print(k)
